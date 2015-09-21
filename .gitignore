@@ -12,3 +12,25 @@ __pycache__/
 *.pdf
 
 *.gz
+
+data/
+
+*.class
+
+RI/RI_Project/indexation/target/streams/$global/projectDescriptors/$global/streams/out
+
+RI/RI_Project/indexation/target/streams/$global/update/$global/streams/out
+
+*.xml
+
+*.cache
+
+RI/RI_Project/indexation/target/.history
+
+*.properties
+
+*.css
+
+*.xsl
+
+target/
