@@ -8,21 +8,23 @@ package com.fulldeep.indexation;
 // import java.util.regex.Matcher;
 // import java.util.regex.Pattern;
 import com.fulldeep.indexation._
+import java.io.RandomAccessFile;
 
 object index {
 //REMPLIIIR DE PLEIN DE BONNES CHOSES
   class index(val name:String, val parser:Parser, val textRepresenter:Stemmer) extends Serializable {
 
-    def indexation(filename:String)={
-
-    }
+    // def indexation(filename:String)={
+    //
+    // }
     def getTfsForDoc(index:RandomAccessFile):Map[Int,List[(String,Int)]] = {
-
+      return Map()
     }
     def getTfsForStem(index:RandomAccessFile):Map[String,List[(Int,Int)]] = {
-
+      return Map()
     }
     def getStrDoc(id:Int):String={
+      return ""
 
     }
   }
