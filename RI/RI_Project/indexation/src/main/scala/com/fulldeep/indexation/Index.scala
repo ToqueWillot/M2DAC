@@ -2,21 +2,42 @@ package com.fulldeep.indexation;
 
 
 
-// import java.io._;
-// import java.util.ArrayList;
-// import java.util.HashMap;
-// import java.util.regex.Matcher;
-// import java.util.regex.Pattern;
+import scala.collection.JavaConverters._
 import com.fulldeep.indexation._
-import java.io.RandomAccessFile;
+import java.io.RandomAccessFile
+import java.io.File
 
 object index {
-//REMPLIIIR DE PLEIN DE BONNES CHOSES
+
   class index(val name:String, val parser:Parser, val textRepresenter:Stemmer) extends Serializable {
 
-    // def indexation(filename:String)={
-    //
-    // }
+    val file_index : File = new File(name+"_index.csv")
+    val index: RandomAccessFile = new RandomAccessFile(file_index, "rw")
+
+    val file_inverted : File = new File(name+"_inverted.csv")
+    val inverted: RandomAccessFile = new RandomAccessFile(file_inverted, "rw")
+
+    val docs: scala.collection.mutable.Map[Int,(Int,Int)]=scala.collection.mutable.Map()
+    val stems: scala.collection.mutable.Map[Int,(Int,Int)]=scala.collection.mutable.Map()
+    val docFrom: scala.collection.mutable.Map[Int,(Int,Int)]=scala.collection.mutable.Map()
+
+
+    def indexation(filename:String):Unit={
+      parser.init(filename)
+
+    }
+
+    //function utils
+    def getMapWordOccurFromString(text : String,textRepresenter:Stemmer=textRepresenter): Map[String,Int]={
+      textRepresenter.porterStemmerHash(text).asScala.mapValues(_.intValue).toMap - " * "
+    }
+    def createStringFromMap(myMap: Map[String,Int]):String={
+      myMap.map(tuple=> tuple._1+","+tuple._2.toString).toArray.mkString(";")
+    }
+    def createMapFromString(myString: String ): Map[String,Int]={
+      myString.split(";").toList.map(elem=> (elem.split(",")(0),elem.split(",")(1).toInt)).toMap
+    }
+    //TODO--------------
     def getTfsForDoc(index:RandomAccessFile):Map[Int,List[(String,Int)]] = {
       return Map()
     }
@@ -25,7 +46,6 @@ object index {
     }
     def getStrDoc(id:Int):String={
       return ""
-
     }
   }
 
