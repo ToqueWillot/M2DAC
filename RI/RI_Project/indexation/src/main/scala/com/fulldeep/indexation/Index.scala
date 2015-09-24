@@ -7,18 +7,18 @@ import com.fulldeep.indexation._
 import java.io.RandomAccessFile
 import java.io.File
 
-object index {
+object Index {
 
-  class index(val name:String, val parser:Parser, val textRepresenter:Stemmer) extends Serializable {
+  class Index(val name:String, val parser:Parser, val textRepresenter:Stemmer) extends Serializable {
 
-    val file_index : File = new File(name+"_index.csv")
+    val file_index : File = new File("src/resources/"+name+"_index.csv")
     val index: RandomAccessFile = new RandomAccessFile(file_index, "rw")
 
-    val file_inverted : File = new File(name+"_inverted.csv")
+    val file_inverted : File = new File("src/resources/"+name+"_inverted.csv")
     val inverted: RandomAccessFile = new RandomAccessFile(file_inverted, "rw")
 
     val docs: scala.collection.mutable.Map[Int,(Int,Int)]=scala.collection.mutable.Map()
-    val stems: scala.collection.mutable.Map[Int,(Int,Int)]=scala.collection.mutable.Map()
+    val stems: scala.collection.mutable.Map[String,(Int,Int)]=scala.collection.mutable.Map()
     val docFrom: scala.collection.mutable.Map[Int,(Int,Int)]=scala.collection.mutable.Map()
 
 
@@ -29,11 +29,11 @@ object index {
       var doc = parser.nextDocument()
       while(doc!=null){
         val curF:Int=index.getFilePointer().toInt
-        val line:String = doc.getId()+";"+createStringFromMap(getMapWordOccurFromString(doc.getText()))
-        val sizeLine:Int = line.size
+        val line:String = doc.getId()+":"+createStringFromMap(getMapWordOccurFromString(doc.getText()))
+        val sizeLine:Int = line.size+2
 
         index.writeChars(line+"\n")
-        docs.put(doc.getId().toInt ,(curF, sizeLine-1))
+        docs.put(doc.getId().toInt ,(curF, sizeLine))
         doc = parser.nextDocument()
       }
     }
@@ -51,17 +51,17 @@ object index {
             mapWordDoc(t._1).put(t._2._1,t._2._2)
           else
             mapWordDoc.put(t._1, scala.collection.mutable.Map((t._2._1,t._2._2)))
-
         )
+        doc = parser.nextDocument()
       }
 
       inverted.seek(0)
       mapWordDoc.map(e=>{
-        val curF:Int=inverted.getFilePointer().toInt
-        val line:String = e._1+";"+createStringFromMapIntInt(e._2.toMap)
-        val sizeLine:Int = line.size
-        inverted.writeChars(line+"\n")
-        stems.put(doc.getId().toInt ,(curF, sizeLine-1))
+      val curF:Int=inverted.getFilePointer().toInt
+      val line:String = e._1+":"+createStringFromMapIntInt(e._2.toMap)
+      val sizeLine:Int = line.size+2
+      inverted.writeChars(line+"\n")
+      stems.put(e._1 ,(curF, sizeLine))
       })
     }
 
@@ -75,17 +75,27 @@ object index {
     def createStringFromMap(myMap: Map[String,Int]):String={
       myMap.map(tuple=> tuple._1+","+tuple._2.toString).toArray.mkString(";")
     }
-    def createMapFromString(myString: String ): Seq[(String,Int)]={
+    def createSeqFromString(myString: String ): Seq[(String,Int)]={
       myString.split(";").toList.map(elem=> (elem.split(",")(0),elem.split(",")(1).toInt)).toSeq
     }
+     def readRAF(begin:Int,size:Int, file: RandomAccessFile):String={
+       file.seek(begin)
+       List.range(1,size).map(_=>file.readChar()).toArray.mkString("")
+     }
+
     //TODO--------------
-    // def getTfsForDoc(doc:Int):Option[Map[Int,Seq[(String,Int)]]]= {
-    //   docs
-    //   return Map()
-    // }
-    def getTfsForStem(index:RandomAccessFile):Map[String,List[(Int,Int)]] = {
-      return Map()
+    def getTfsForDoc(doc:Int):Option[Seq[(String,Int)]]={
+      docs.get(doc) match{
+        case Some((begin,size))=> Option(createSeqFromString(readRAF(begin,size,index).split(":")(1)))
+        case None => None
+      }
     }
+    // def getTfsForStem(stem:String):Option[Seq[(Int,Int)]] = {
+    //   stems.get(stem) match{
+    //     case Some(str)=> createSeqFromString(str.split(":")(1)).map(a=>(a._1.toInt,a._2))
+    //     case None => None
+    //   }
+    // }
     def getStrDoc(id:Int):String={
       return ""
     }

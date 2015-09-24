@@ -40,3 +40,9 @@ target/
 *.jpg
 
 Scene/
+
+*.csv
+
+*.txt
+
+*.txt

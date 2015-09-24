@@ -8,6 +8,9 @@ import java.io.RandomAccessFile
 import scala.io
 import java.io.File
 
+
+
+
 val filename :String = "../../data/cacm/cacm.txt"
 val parser = new ParserCISI_CACM()
 parser.init(filename)
@@ -75,3 +78,68 @@ docs.map(e => {val a = e._2._1
  for( i <- 72 to 135){
    print(""+ raf.readChar())
  }
+
+
+ val textRepresenter=stemmer
+ def getMapWordOccurFromString(text : String,textRepresenter:Stemmer=textRepresenter): Map[String,Int]={
+   textRepresenter.porterStemmerHash(text).asScala.mapValues(_.intValue).toMap - " * "
+ }
+ parser.init(filename)
+ val mapWordDoc: scala.collection.mutable.Map[String,scala.collection.mutable.Map[Int,Int]]=scala.collection.mutable.Map()
+ var doc = parser.nextDocument()
+ while(doc!=null){
+   val listWordDoc: List[(String,(Int,Int))] = getMapWordOccurFromString(doc.getText()).map(e=> (e._1,(doc.getId().toInt,e._2))).toList
+
+   listWordDoc.foreach(t =>
+     if( mapWordDoc.keySet.exists(_ == t._1) )
+       mapWordDoc(t._1).put(t._2._1,t._2._2)
+     else
+       mapWordDoc.put(t._1, scala.collection.mutable.Map((t._2._1,t._2._2)))
+
+   )
+   doc = parser.nextDocument()
+ }
+
+
+ val file_inverted : File = new File("tesst_inverted.csv")
+ val inverted: RandomAccessFile = new RandomAccessFile(file_inverted, "rw")
+ inverted.seek(0)
+ mapWordDoc.map(e=>{
+   val curF:Int=inverted.getFilePointer().toInt
+   val line:String = e._1+";"+createStringFromMapIntInt(e._2.toMap)
+   val sizeLine:Int = line.size
+   inverted.writeChars(line+"\n")
+   //stems.put(doc.getId().toInt ,(curF, sizeLine-1))
+ })
+
+ mapWordDoc.map(e=>{
+   val line:String = e._1+";"+createStringFromMapIntInt(e._2.toMap)
+   println(line)
+ })
+
+
+ def readRAF(begin:Int,size:Int, file: RandomAccessFile):String={
+   file.seek(begin)
+   List.range(1,size).map(_=>file.readChar()).toArray.mkString("")
+ }
+val filename :String = "../cacmTaille2Test.txt"
+
+indexer.createSeqFromString(indexer.readRAF(0,81,indexer.index).split(":")(1))
+ //-------------------------------------------
+  import com.fulldeep.indexation._
+  import scala.collection.JavaConversions._
+  import scala.collection.JavaConverters._
+  import java.io.RandomAccessFile
+  import scala.io
+  import java.io.File
+
+  //val filename :String = "../../data/cacm/cacm.txt"
+  val filename :String = "../cacmTaille2Test.txt"
+
+  val parser = new ParserCISI_CACM()
+  val stemmer = new Stemmer()
+
+  val indexer = new Index.Index("cacm2",parser,stemmer)
+  indexer.docs
+  indexer.indexation_index(filename)
+  indexer.indexation_inverted(filename)
