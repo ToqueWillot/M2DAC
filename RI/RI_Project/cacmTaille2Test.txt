@@ -1,6 +1,6 @@
 .I 1
 .T
-Preliminary Report-International Algebraic Language
+Preliminary Report-International Algebraic Language paul
 .B
 CACM December, 1958
 .A
@@ -46,7 +46,7 @@ CA581203 JB March 22, 1978  8:28 PM
 
 .I 2
 .T
-Extraction of Roots by Repeated Subtractions for Digital Computers
+Extraction of Roots by Repeated Subtractions for Digital Computers paul paul
 .B
 CACM December, 1958
 .A
@@ -60,7 +60,7 @@ CA581202 JB March 22, 1978  8:29 PM
 
 .I 3
 .T
-Techniques Department on Matrix Program Schemes
+Techniques Department on Matrix Program Schemes paul
 .B
 CACM December, 1958
 .A
