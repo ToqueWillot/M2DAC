@@ -43,39 +43,39 @@
 \usepackage[french]{babel}
 \usepackage[utf8x]{inputenc}
 
-\firstname{\textcolor[rgb]{0.40,0.40,0.40}{Paul}} % Your first name
-\familyname{Willot} % Your last name
+\firstname{\textcolor[rgb]{0.40,0.40,0.40}{Florian}} 
+\familyname{Toqué} 
+\title{Data Science lover}
+
 
 % All information in this block is optional, comment out any lines you don't need
 %\title{Curriculum Vitae}
-\title{Passioné de DataScience}
-\address{2 quai du barrage}{94340, Joinville-le-Pont}
-\mobile{+33 6 76 13 83 21}
-\email{paul.willot@etu.upmc.fr}
-\extrainfo{19/12/1995}
-\photo{picture.jpg}
+\address{1 rue Maryse Hilsz}{Paris, 75020}
+\mobile{06 58 88 84 78}
+\email{florian.toque@gmail.com}
+\extrainfo{22/05/1993 (22 ans)}
 %\homepage{}{} % The first argument is the url for the clickable link, the second argument is the url displayed in the template - this allows special characters to be displayed such as the tilde in this example
 %\extrainfo{additional information}
-%\photo[70pt][0.4pt]{pictures/picture} % The first bracket is the picture height, the second is the thickness of the frame around the picture (0pt for no frame)
-%\quote{"A witty and playful quotation" - John Smith}
+\photo[80pt][0.05pt]{picture.jpg} % The first bracket is the picture height, the second is the thickness of the frame around the picture (0pt for no frame)
 
-\quote{\textbf{\hfill \\Recherche un stage de fin d'études en machine learning.}}
+\quote{\textbf{\hfill \\Looking for an internship in machine learning.}}
 
 %----------------------------------------------------------------------------------------
 \nopagenumbers 
 \begin{document}
-
-\makecvtitle % Print the CV title
-\hfill \break
+\makecvtitle
 %\hrulefill
+
+
 %----------------------------------------------------------------------------------------
 %	EDUCATION SECTION
 %----------------------------------------------------------------------------------------
 
-\section{Formations}
+\section{Education}
 
-\cventry{2014-2016}{Master Informatique spécialité Données, Apprentissage et Connaissance}{Université Pierre et Marie Curie }{Paris VI}{mention parcours d'excellence}{}  % Arguments not required can be left empty
-\cventry{2011--2014}{Licence d'informatique}{Université Pierre et Marie Curie }{Paris VI}{mention parcours international}{}
+\cventry{2014-2016}{Master Données, Apprentissage et Connaissance (Data Science and Machine Learning)}{Université Pierre et Marie Curie }{Paris VI}{}{}
+\cventry{2011-2014}{Bachelor in computer science}{Université Pierre et Marie Curie }{Paris VI}{}{}
+%\cventry{2011}{Baccalauréat Scientifique}{Lycée Saint-Pierre}{Brunoy}{}{}
 
 %\section{Masters Thesis}
 %\cvitem{Title}{\emph{Money Is The Root Of All Evil -- Or Is It?}}
@@ -86,57 +86,47 @@
 %	WORK EXPERIENCE SECTION
 %----------------------------------------------------------------------------------------
 
-\section{Stages}
+\section{Internship}
 
 %\subsection{Vocational}
 %mettre encadrant peut être...
-\cventry{Juin-Septembre 2015}{Research in Natural Language Processing}{Tokyo}{National Institute of Informatics}{}{
-\textsc{Extracting Structure from Scientific Abstracts using Neural Networks}\\
-\textit{Published by Springler, presented at ICADL 2015, Seoul.}}
-%\newline{}
-%\newline{}
+\cventry{June-September 2015}{Internship}{\textsc{Heuritech}}{Paris}{Startup specialized in semantic analysis.}{
+Conception of deep learning framework for natural language processing, using Scala, Python and Sparql.
+%Développement d'algorithmes de machine learning et de deep learning pour le traitement automatique du langage. Développement en Scala. Utilisation secondaire de Python et Sparql.
 %Detailed achievements:
 %\begin{itemize}
 %\item Développement en Scala et python. Utilisation de modèle Word2Vec.
 %\item another thing
 %\item Managing complex system from previous intern
 %\end{itemize}
+}
+
 
 %------------------------------------------------
-
 %\cventry{2010--2011}{Summer Intern}{\textsc{Lehman Brothers}}{Los Angeles}{}{Rated "truly distinctive" for Analytical Skills and Teamwork.}
-
 %------------------------------------------------
 
-
-%rangement, équipement, entretien des livres, accueil des lecteurs et formation d'agents}
-
-%\cventry{2012--2016}{Science private lessons}{House}{my Neighborhood}{}{Talked with ADHD-)}
 
 %----------------------------------------------------------------------------------------
 %	AWARDS SECTION
 %----------------------------------------------------------------------------------------
-
 %\section{Awards}
-
 %\cvitem{2011}{School of Business Postgraduate Scholarship}
 %\cvitem{2010}{Top Achiever Award -- Commerce}
 
 
-\section{Projets}
-%\cventry{2015}{Time series analysis}{}{}{}{Anomaly detection on smart cards data from the Parisian subway network (STIF): study about the impact of social events on metro traffic.}
-\cventry{2015}{Analyse de séries temporelles}{}{Paris}{}{Travail sur des données du STIF: Détection d'anomalies sur des séries temporelles de flux d'usagers des transports en communs.}
-\cventry{2015}{Analyse automatique de texte français et anglais}{}{Paris}{}{Extraction de mots clés, d'entitées nommées et de thèmes à l'aide d'algorithme non supervisés de machine learning.}
-\cventry{2014}{Compétition de robotique}{Pluri-universitaire}{Paris}{}{Modélisation et construction d'un drone, vainqueur de la compétition.}
+\section{Projects}
+\cventry{2015}{Time series analysis}{}{Paris}{}{Anomaly detection on smart cards data from the Parisian subway network (STIF): study about the impact of social events on metro traffic.}
+\cventry{2015}{Text analysis on both French and English}{}{Paris}{}{Keyword, named entity and theme extraction, using unsupervised learning.}
+\cventry{2014}{Robotic challenge}{}{Paris}{}{Design and building of a drone, challenge winner.}
 
 %----------------------------------------------------------------------------------------
 %	COMPUTER SKILLS SECTION
 %----------------------------------------------------------------------------------------
 
-\section{Compétences Techniques}
-\cvitem{Intermediaire}{\textsc{Scala},\textsc{SQL}, \textsc{OCaml}, \textsc{C}, \textsc{Ada}, \LaTeX}
-\cvitem{Avancé}{\textsc{Python} (pandas/theano/gensim), \textsc{Lua} (torch), \textsc{Matlab}}
-%C, Python, Java, Ada, OCaml, HTML, SQL,
+\section{Skills}
+\cvitem{Sufficient}{\textsc{Spark}, \textsc{SQL}, \textsc{OCaml}, \textsc{C}, \textsc{VBA}, \LaTeX}
+\cvitem{Advanced}{\textsc{Python} (sklearn, pandas, theano, gensim), \textsc{Scala}, \textsc{Matlab}, \textsc{Lua} (torch)}
 
 %----------------------------------------------------------------------------------------
 %	COMMUNICATION SKILLS SECTION
@@ -157,13 +147,11 @@
 %scolaire
 %notions
 
-\section{Langues}
+\section{Languages}
 
-\renewcommand{\listitemsymbol}{} % Changes the symbol used for lists
-%\cvlistdoubleitem{French \textbf{~~Native}}{English \textbf{~~~Proficient}}
-%\cvlistdoubleitem{German \textbf{~Survivable}}{Japanese \textbf{~Basic}}
-\cvlistdoubleitem{\textbf{French} ~~Native}{\textbf{English} ~~~Proficient}
-\cvlistdoubleitem{\textbf{German} ~Survivable}{\textbf{Japanese} ~Basic}
+\renewcommand{\listitemsymbol}{} 
+\cvlistdoubleitem{\textbf{French} Native}{\textbf{English} Upper-advanced}
+\cvlistdoubleitem{\textbf{Spanish} Upper-advanced}{\textbf{Japanese} Basic}
 %\cvitemwithcomment{Spanish}{Basic}{Basic words and phrases only}
 
 %----------------------------------------------------------------------------------------
@@ -172,17 +160,14 @@
 
 %\section{Divers}
 %\cvlistitem{Permis obtenu en 2012}
-\section{Centres d'intérêts}
+\section{Interests}
 
-\renewcommand{\listitemsymbol}{~} % Changes the symbol used for lists
-
-%\cvitem{Meetup}{Machine Learning, Deep Learning}
-%\cvitem{Sports}{Rock climbing, Skiing, Hiking, Hacking}
-%\cvitem{Musique}{Piano}
+\renewcommand{\listitemsymbol}{} % Changes the symbol used for lists
 
 \cvlistitem{Deep Learning, Kaggle, Meetups}
-\cvlistitem{Sports: Rock climbing, Skiing, Hiking, Hacking}
-\cvlistitem{Musique: Piano}
+%\cvlistitem{Vainqueur d'une compétion de modélisme de drone}
+\cvlistitem{Sports: Rock climbing, Rowing}
+\cvlistitem{Music: Saxophone}
 
 
 %\cvlistdoubleitem{Traveling}{Reading}
@@ -204,19 +189,19 @@
 
 % To remove the cover letter, comment out this entire block
 
-%\clearpage
+\clearpage
 
-%\recipient{HR Department}{Corporation\\123 Pleasant Lane\\12345 City, State} % Letter recipient
-%\date{\today} % Letter date
-%\opening{Dear Sir or Madam,} % Opening greeting
-%\closing{Sincerely yours,} % Closing phrase
-%\enclosure[Attached]{curriculum vit\ae{}} % List of enclosed documents
+\recipient{HR Department}{Corporation\\123 Pleasant Lane\\12345 City, State} % Letter recipient
+\date{\today} % Letter date
+\opening{Dear Sir or Madam,} % Opening greeting
+\closing{Sincerely yours,} % Closing phrase
+\enclosure[Attached]{curriculum vit\ae{}} % List of enclosed documents
 
-%\makelettertitle % Print letter title
+\makelettertitle % Print letter title
 
-%\lipsum[1-3] % Dummy text
+\lipsum[1-3] % Dummy text
 
-%\makeletterclosing % Print letter signature
+\makeletterclosing % Print letter signature
 
 %----------------------------------------------------------------------------------------
 
