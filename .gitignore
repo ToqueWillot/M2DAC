@@ -34,3 +34,9 @@ RI/RI_Project/indexation/target/.history
 *.xsl
 
 target/
+
+*.zip
+
+*.jpg
+
+Scene/

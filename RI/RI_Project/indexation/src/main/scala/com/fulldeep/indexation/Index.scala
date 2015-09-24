@@ -22,25 +22,67 @@ object index {
     val docFrom: scala.collection.mutable.Map[Int,(Int,Int)]=scala.collection.mutable.Map()
 
 
-    def indexation(filename:String):Unit={
+    def indexation_index(filename:String):Unit={
+      parser.init(filename)
+      index.seek(0)
+
+      var doc = parser.nextDocument()
+      while(doc!=null){
+        val curF:Int=index.getFilePointer().toInt
+        val line:String = doc.getId()+";"+createStringFromMap(getMapWordOccurFromString(doc.getText()))
+        val sizeLine:Int = line.size
+
+        index.writeChars(line+"\n")
+        docs.put(doc.getId().toInt ,(curF, sizeLine-1))
+        doc = parser.nextDocument()
+      }
+    }
+
+    def indexation_inverted(filename:String):Unit={
       parser.init(filename)
 
+      val mapWordDoc: scala.collection.mutable.Map[String,scala.collection.mutable.Map[Int,Int]]=scala.collection.mutable.Map()
+      var doc = parser.nextDocument()
+      while(doc!=null){
+        val listWordDoc: List[(String,(Int,Int))] = getMapWordOccurFromString(doc.getText()).map(e=> (e._1,(doc.getId().toInt,e._2))).toList
+
+        listWordDoc.foreach(t =>
+          if( mapWordDoc.keySet.exists(_ == t._1) )
+            mapWordDoc(t._1).put(t._2._1,t._2._2)
+          else
+            mapWordDoc.put(t._1, scala.collection.mutable.Map((t._2._1,t._2._2)))
+
+        )
+      }
+
+      inverted.seek(0)
+      mapWordDoc.map(e=>{
+        val curF:Int=inverted.getFilePointer().toInt
+        val line:String = e._1+";"+createStringFromMapIntInt(e._2.toMap)
+        val sizeLine:Int = line.size
+        inverted.writeChars(line+"\n")
+        stems.put(doc.getId().toInt ,(curF, sizeLine-1))
+      })
     }
 
     //function utils
+    def createStringFromMapIntInt(myMap: Map[Int,Int]):String={
+      myMap.map(tuple=> tuple._1.toString+","+tuple._2.toString).toArray.mkString(";")
+    }
     def getMapWordOccurFromString(text : String,textRepresenter:Stemmer=textRepresenter): Map[String,Int]={
       textRepresenter.porterStemmerHash(text).asScala.mapValues(_.intValue).toMap - " * "
     }
     def createStringFromMap(myMap: Map[String,Int]):String={
       myMap.map(tuple=> tuple._1+","+tuple._2.toString).toArray.mkString(";")
     }
-    def createMapFromString(myString: String ): Map[String,Int]={
-      myString.split(";").toList.map(elem=> (elem.split(",")(0),elem.split(",")(1).toInt)).toMap
+    def createMapFromString(myString: String ): Seq[(String,Int)]={
+      myString.split(";").toList.map(elem=> (elem.split(",")(0),elem.split(",")(1).toInt)).toSeq
     }
     //TODO--------------
-    def getTfsForDoc(index:RandomAccessFile):Map[Int,List[(String,Int)]] = {
-      return Map()
-    }
+    // def getTfsForDoc(doc:Int):Option[Map[Int,Seq[(String,Int)]]]= {
+    //   docs
+    //   return Map()
+    // }
     def getTfsForStem(index:RandomAccessFile):Map[String,List[(Int,Int)]] = {
       return Map()
     }
