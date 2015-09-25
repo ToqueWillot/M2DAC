@@ -85,6 +85,7 @@ object Index {
         doc = parser.nextDocument()
       }
       println("Partie 1/3 terminée ")
+      Console.flush(); 
       //set buffer for all Words
       val mapTemp: scala.collection.mutable.Seq[(String,Int)] = scala.collection.mutable.Seq(mapWordSize.toSeq: _*)
       var buff:Int = 0
@@ -96,6 +97,7 @@ object Index {
       val mapWordBuffer : scala.collection.mutable.Map[String,Int] = scala.collection.mutable.Map(seqWordBuffer: _*)
       mapWordBuffer.map(w=> stems.put(w._1,(w._2*2,mapWordSize(w._1))))
       println("Partie 2/3 terminée ")
+      Console.flush();
       //Second reading of Documents, writting on inverted
       parser.init(filename)
       doc = parser.nextDocument()
@@ -128,6 +130,7 @@ object Index {
         doc = parser.nextDocument()
       }
       println("Partie 3/3 terminée ")
+      Console.flush();
     }
 
     //function utils
