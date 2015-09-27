@@ -235,17 +235,21 @@ object Index {
        file.seek(begin)
        List.range(0,size).map(_=>file.readByte().asInstanceOf[Char]).toArray.mkString("")
      }
+     def readRAF2(begin:Int,size:Int, file: RandomAccessFile):String={
+       file.seek(begin)
+       List.range(0,size).map(_=>file.readChar()).toArray.mkString("")
+     }
 
     //TODO--------------
     def getTfsForDoc(doc:Int):Option[Seq[(String,Int)]]={
       docs.get(doc) match{
-        case Some((begin,size))=> Option(createSeqFromString(readRAF(begin,size,index).split(":")(1)))
+        case Some((begin,size))=> Option(createSeqFromString(readRAF2(begin,size,index).split(":")(1)))
         case None => None
       }
     }
     def getTfsForStem(stem:String):Option[Seq[(Int,Int)]] = {
       stems.get(stem) match{
-        case Some((begin,size))=> Option(createSeqIntIntFromString(readRAF(begin,size,inverted).split(":")(1)))
+        case Some((begin,size))=> Option(createSeqIntIntFromString(readRAF2(begin,size,inverted).split(":")(1)))
         case None => None
       }
     }
