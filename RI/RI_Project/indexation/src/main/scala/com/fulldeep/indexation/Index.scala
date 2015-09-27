@@ -143,7 +143,7 @@ object Index {
         doc = parser.nextDocument()
       }
       println("Partie 1/3 terminée ")
-      Console.flush();
+
       //set buffer for all Words
       val mapTemp: scala.collection.mutable.Seq[(String,Int)] = scala.collection.mutable.Seq(mapWordSize.toSeq: _*)
       var buff:Int = 0
@@ -188,7 +188,7 @@ object Index {
         doc = parser.nextDocument()
       }
       println("Partie 3/3 terminée ")
-<<<<<<< HEAD
+
 
       //write in file docs
       val pw = new PrintWriter(new File(filenameStems))
@@ -197,9 +197,7 @@ object Index {
         pw.write(txt)
       })
       pw.close
-=======
-      Console.flush();
->>>>>>> origin/master
+
     }
 
 
