@@ -1,4 +1,4 @@
-name := "RI_Project"
+name := "RI_Project-indexation"
 
 organization := "com.fulldeep"
 
