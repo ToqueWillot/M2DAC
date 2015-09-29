@@ -138,7 +138,7 @@ object Index {
           if( mapWordSize.keySet.exists(_ == t._1) )
             mapWordSize(t._1)+=t._2
           else
-            mapWordSize.put(t._1, t._2+ (t._1+":").size)
+            mapWordSize.put(t._1, t._2+(t._1+":").size)
         )
         doc = parser.nextDocument()
       }
