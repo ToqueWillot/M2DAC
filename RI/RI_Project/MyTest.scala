@@ -18,6 +18,12 @@
   indexer.docs
   indexer.indexation(filename)
 
+  val weighter = new Weighter.WeighterTF(indexer)
+
+  val query=" What articles exist which deal with TSS (Time Sharing System), an operating system for IBM computers?"
+  val mapquery :Map[String,Int]= indexer.getMapWordOccurFromString(query)
+  weighter.getWeightsForQuery(mapquery)
+  indexer.getTfsForStem("articl")
 
 
   //----------------------------------------------------
@@ -48,3 +54,29 @@
 //   pw.write(txt)
 // })
 // pw.close
+
+
+
+import com.fulldeep.indexation._
+import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
+import java.io.RandomAccessFile
+import scala.io
+import java.io.File
+
+//val filename :String = "../../data/cacm/cacm.txt"
+val filename :String = "../cacmTaille2Test.txt"
+
+val parser = new ParserCISI_CACM()
+val stemmer = new Stemmer()
+
+val indexer = new Index.Index("cacm2",parser,stemmer)
+indexer.docs
+indexer.indexation(filename)
+
+val weighter = new Weighter.WeighterTF(indexer)
+
+val query=" What articles exist which deal with TSS (Time Sharing System), an operating system for IBM computers?"
+val mapquery :Map[String,Int]= indexer.getMapWordOccurFromString(query)
+weighter.getWeightsForQuery(mapquery)
+indexer.getTfsForStem("zuckerman")

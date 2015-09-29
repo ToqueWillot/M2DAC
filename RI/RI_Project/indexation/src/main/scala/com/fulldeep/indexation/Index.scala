@@ -170,7 +170,7 @@ object Index {
             wordWrite(w._1)=true
             val curWord:Int = mapWordBuffer(w._1)*2
             inverted.seek(curWord)
-            val toWrite :String= w._1+":"+w._2._1+","+w._2._1+";"
+            val toWrite :String= w._1+":"+w._2._1+","+w._2._2+";"
             val sizeLine:Int = toWrite.size
             inverted.writeChars(toWrite)
             mapWordBuffer(w._1)+=sizeLine
