@@ -33,6 +33,8 @@ RI/RI_Project/indexation/target/.history
 
 *.xsl
 
+*.JPG
+
 target/
 
 *.zip
