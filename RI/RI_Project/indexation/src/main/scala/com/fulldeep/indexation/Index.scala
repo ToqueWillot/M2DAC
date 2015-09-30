@@ -55,7 +55,7 @@ object Index {
     //indexation : create files:  index inverted  and
     def indexation(filename:String):Unit={
       if(!(new java.io.File(filenameDocs).exists)){ indexation_index(filename)}
-      if(!(new java.io.File(filenameStems).exists)){ indexation_inverted(filename)}
+      if(!(new java.io.File(filenameStems).exists)){ indexation_inverted2(filename)}
       if(!(new java.io.File(filenameDocFrom).exists)){ createDocFrom(filename)}
     }
 
@@ -97,32 +97,39 @@ object Index {
       pw.close
     }
 
-    // def indexation_inverted2(filename:String):Unit={
-    //   parser.init(filename)
-    //
-    //   val mapWordDoc: scala.collection.mutable.Map[String,scala.collection.mutable.Map[Int,Int]]=scala.collection.mutable.Map()
-    //   var doc = parser.nextDocument()
-    //   while(doc!=null){
-    //     val listWordDoc: List[(String,(Int,Int))] = getMapWordOccurFromString(doc.getText()).map(e=> (e._1,(doc.getId().toInt,e._2))).toList
-    //
-    //     listWordDoc.foreach(t =>
-    //       if( mapWordDoc.keySet.exists(_ == t._1) )
-    //         mapWordDoc(t._1).put(t._2._1,t._2._2)
-    //       else
-    //         mapWordDoc.put(t._1, scala.collection.mutable.Map((t._2._1,t._2._2)))
-    //     )
-    //     doc = parser.nextDocument()
-    //   }
-    //
-    //   inverted.seek(0)
-    //   mapWordDoc.map(e=>{
-    //   val curF:Int=inverted.getFilePointer().toInt
-    //   val line:String = e._1+":"+createStringFromMapIntInt(e._2.toMap)
-    //   val sizeLine:Int = line.size
-    //   inverted.writeChars(line+"\n")
-    //   stems.put(e._1 ,(curF, sizeLine))
-    //   })
-    // }
+    def indexation_inverted2(filename:String):Unit={
+      parser.init(filename)
+
+      val mapWordDoc: scala.collection.mutable.Map[String,scala.collection.mutable.Map[Int,Int]]=scala.collection.mutable.Map()
+      var doc = parser.nextDocument()
+      while(doc!=null){
+        val listWordDoc: List[(String,(Int,Int))] = getMapWordOccurFromString(doc.getText()).map(e=> (e._1,(doc.getId().toInt,e._2))).toList
+
+        listWordDoc.foreach(t =>
+          if( mapWordDoc.keySet.exists(_ == t._1) )
+            mapWordDoc(t._1).put(t._2._1,t._2._2)
+          else
+            mapWordDoc.put(t._1, scala.collection.mutable.Map((t._2._1,t._2._2)))
+        )
+        doc = parser.nextDocument()
+      }
+
+      inverted.seek(0)
+      mapWordDoc.map(e=>{
+      val curF:Int=inverted.getFilePointer().toInt
+      val line:String = e._1+":"+createStringFromMapIntInt(e._2.toMap)
+      val sizeLine:Int = line.size
+      inverted.writeChars(line+"\n")
+      stems.put(e._1 ,(curF, sizeLine))
+      })
+      //write in file docs
+      val pw = new PrintWriter(new File(filenameStems))
+      stems.map(elem=>{
+        val txt:String=elem._1.toString+":"+elem._2._1.toString+":"+elem._2._2.toString+"\n"
+        pw.write(txt)
+      })
+      pw.close
+    }
 
     def indexation_inverted(filename:String):Unit={
 
