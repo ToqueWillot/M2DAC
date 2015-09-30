@@ -24,6 +24,9 @@ end
 
 gnuplot.plot(x)
 
+a = 2
+
+a = 3
 
 -- starting
 ITERATIONS=100
