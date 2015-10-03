@@ -26,6 +26,7 @@ for i = 1:4
         blocMg = Mg(x:x+patchSize-1, y:y+patchSize-1);
         for c = 1:8
             tmp = ((blocOr == c) .* blocGr .* blocMg);
+            %tmp = ((blocOr == c) + blocGr .* blocMg);
             H(c,j,i) = sum(tmp(:));
         end
     end
