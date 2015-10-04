@@ -90,7 +90,6 @@ end
 
 function getGridtoPlot(model,x,labels,colorsGrid)
   toPlot = {}
-  -- Region
   xGrid = getPointsGrid(x,100)
   xGridInputs = xGrid
   yGrid = model:forward(xGrid)
@@ -122,13 +121,11 @@ function plot_decision(x,y,model,labels,colors,colorsGrid,name)
   end
   gnuplot.pngfigure(name)
   gnuplot.plot(toPlot)
-  --gnuplot.plot(toPlot2)
   gnuplot.close()
 end
 
 function getGridtoPlot3dim(model,x,labels,colorsGrid)
   toPlot = {}
-  -- Region
   xGrid = getPointsGrid(x,100)
   xGridInputs = torch.cat(xGrid, torch.cmul(xGrid[{{},1}], xGrid[{{},2}]),2)
   yGrid = model:forward(xGridInputs)
@@ -171,24 +168,29 @@ name="test points.png"
 
 
 
---Linear Model, Gaussian 2 classes no problem
+--Linear Model, Gaussian 2 classes
+--fit the linear model with x and y
 function create_modelLinear(x,y,nIter,ep,criterion,layer)
   model = nn.Linear(layer[1],layer[2])
   for i = 1,nIter do
      model:zeroGradParameters()
      y_chap = model:forward(x)
      loss = criterion:forward(y_chap, y)
-     theta = criterion:backward(y_chap, y)
-     model:backward(x, theta)
+     grad = criterion:backward(y_chap, y)
+     model:backward(x, grad)
      model:updateParameters(ep)
   end
   return model
 end
 
 
+
+
+
 -- ______classif_linear_2gauss
+-- exemple of classification with linear model. criterion = MSE (mean squared error)
 local params = {{20,{3,3},1},{20,{-3,-3},-1}}
-local x,y = create_multiclass_xy (params)
+local x,y = create_multiclass_xy (params) -- create data x (gaussian) and y (labels)
 labels={1,-1}
 colors={"red","blue"}
 colorsGrid={"pink","cyan"}
@@ -197,16 +199,16 @@ name="classif_linear_2gauss.png"
 nIter=1000
 ep=0.001
 criterion=nn.MSECriterion()
-layer={2,1}
+layer={2,1} --2 inputs (x[1], x[2]) one output (label)
 model = create_modelLinear(x,y,nIter,ep,criterion,layer)
-
 
 plot_decision(x,y,model,labels,colors,colorsGrid,name)
 
 
 
+
 --______xor model lineaire
--- le model lineaire ne permet pas de separer les deux espaces
+-- le model lineaire ne permet pas de séparer l'espace en trois
 local params = {{20,{3,3},1},
                 {20,{-3,-3},1},
                 {20,{-3,3},-1},
@@ -222,7 +224,6 @@ ep=0.0001
 criterion=nn.MSECriterion()
 layer={2,1}
 model = create_modelLinear(x,y,nIter,ep,criterion,layer)
-
 
 plot_decision(x,y,model,labels,colors,colorsGrid,name)
 
@@ -241,9 +242,9 @@ local x,y = create_multiclass_xy (params)
 
 
 --kernel_trick ajout de dimension aux données dentrées
--- tout espace à N dimensions est séparable en N-1 espaces
-
-
+--[[ le nombre de dimension de x ne permet pas au model lineaire
+de séparer l'espace comme il faut pour classifier les données correctement
+il faut rajouter une dimension x[1]*x[2] ainsi meme le modele lineaire peut classifier correctement les données.]]--
 local new_x= torch.cat(x, torch.cmul(x[{{},1}],x[{{},2}]) ,2)
 
 labels={1,-1}
@@ -254,6 +255,6 @@ name="classif_linear_XOR_KernelTrick.png"
 nIter=10000
 ep=0.0001
 criterion=nn.MSECriterion()
-layer2={3,1}
+layer2={3,1} --3 inputs (x[1], x[2], x[1]*x[2]) one output (label)
 model = create_modelLinear(new_x,y,nIter,ep,criterion,layer2)
 plot_decision3dim(x,y,model,labels,colors,colorsGrid,name)
