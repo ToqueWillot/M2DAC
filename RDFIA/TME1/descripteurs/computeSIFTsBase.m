@@ -5,7 +5,7 @@ close all;
 cate = categories();
 
 % A REMPLACER AVEC LE DOSSIER CONTENANT LES IMAGES 
-pathim = '/Users/floriantoque/Documents/UPMC/M2DAC_git/RDFIA/Scene';
+pathim = '/Users/meat/Documents/UPMC/M2DAC/RDFIA/Scene';
 
 % A REMPLACER AVEC LE DOSSIER CONTENANT LES DESCRIPTEURS SIFT 
 %pathdes = '../../../descriptors3/';
