@@ -96,7 +96,7 @@ function getGridtoPlot(model,x,labels,colorsGrid)
   yGrid = yGrid:sign()
   indices = torch.linspace(1,yGrid:size(1),yGrid:size(1)):long()
   for i = 1, #labels do
-     local selected = indices[yGrid:eq(labels[i])]
+     selected = indices[yGrid:eq(labels[i])]
      table.insert(toPlot, toPlot2D(xGrid:index(1, selected), "grid "..labels[i], colorsGrid[i]))
   end
   return toPlot
@@ -107,7 +107,7 @@ function getPointstoPlot(x,y,labels,colors)
   toPlot = {}
   indices = torch.linspace(1,(#y)[1],(#y)[1]):long()
   for i = 1, #labels do
-     local selected = indices[y:eq(labels[i])]
+     selected = indices[y:eq(labels[i])]
      table.insert(toPlot, toPlot2D(x:index(1, selected), "classe "..labels[i], colors[i]))
   end
   return toPlot
@@ -168,10 +168,9 @@ name="test points.png"
 
 
 
---Linear Model, Gaussian 2 classes
---fit the linear model with x and y
-function create_modelLinear(x,y,nIter,ep,criterion,layer)
-  model = nn.Linear(layer[1],layer[2])
+
+--fit the model with x and y
+function fit_model(x,y,model,nIter,ep,criterion,layer)
   for i = 1,nIter do
      model:zeroGradParameters()
      y_chap = model:forward(x)
@@ -196,13 +195,15 @@ colors={"red","blue"}
 colorsGrid={"pink","cyan"}
 name="classif_linear_2gauss.png"
 
-nIter=1000
-ep=0.001
+nIter=5000
+ep=0.0005
 criterion=nn.MSECriterion()
 layer={2,1} --2 inputs (x[1], x[2]) one output (label)
-model = create_modelLinear(x,y,nIter,ep,criterion,layer)
 
-plot_decision(x,y,model,labels,colors,colorsGrid,name)
+model = nn.Linear(layer[1],layer[2])
+modelfit = fit_model(x,y,model,nIter,ep,criterion,layer)
+
+plot_decision(x,y,modelfit,labels,colors,colorsGrid,name)
 
 
 
@@ -223,9 +224,10 @@ nIter=10000
 ep=0.0001
 criterion=nn.MSECriterion()
 layer={2,1}
-model = create_modelLinear(x,y,nIter,ep,criterion,layer)
+model = nn.Linear(layer[1],layer[2])
+modelfit = fit_model(x,y,model,nIter,ep,criterion,layer)
 
-plot_decision(x,y,model,labels,colors,colorsGrid,name)
+plot_decision(x,y,modelfit,labels,colors,colorsGrid,name)
 
 
 
@@ -252,9 +254,39 @@ colors={"red","blue"}
 colorsGrid={"pink","cyan"}
 name="classif_linear_XOR_KernelTrick.png"
 
-nIter=10000
-ep=0.0001
+nIter=50000
+ep=0.00005
 criterion=nn.MSECriterion()
-layer2={3,1} --3 inputs (x[1], x[2], x[1]*x[2]) one output (label)
-model = create_modelLinear(new_x,y,nIter,ep,criterion,layer2)
-plot_decision3dim(x,y,model,labels,colors,colorsGrid,name)
+layer={3,1} --3 inputs (x[1], x[2], x[1]*x[2]) one output (label)
+model = nn.Linear(layer[1],layer[2])
+modelfit = fit_model(new_x,y,model,nIter,ep,criterion,layer2)
+plot_decision3dim(x,y,modelfit,labels,colors,colorsGrid,name)
+
+
+
+--_____xor reseau de neuronnes 3 couches___________________________
+local params = {{20,{3,3},1},
+                {20,{-3,-3},1},
+                {20,{-3,3},-1},
+                {20,{3,-3},-1}}
+local x,y = create_multiclass_xy (params)
+
+
+--[[A laide d'un reseau de neuronnes à trois couches il est possible de classifier
+les données "XOR" . la couche cachée représente la fonction tanh (permettant de
+découpé l'espace en elipse)]]--
+
+labels={1,-1}
+colors={"red","blue"}
+colorsGrid={"pink","cyan"}
+name="classif_linear_XOR_NN3Layer.png"
+
+nIter=50000
+ep=0.0005
+criterion=nn.MSECriterion()
+model=nn.Sequential()
+model:add(nn.Linear(2,3))
+model:add(nn.Tanh(true))
+model:add(nn.Linear(3,1))
+modelfit = fit_model(x,y,model,nIter,ep,criterion,layer2)
+plot_decision(x,y,modelfit,labels,colors,colorsGrid,name)
