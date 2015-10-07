@@ -48,3 +48,5 @@ Scene/
 *.jpg
 
 FDMS/TME2/Modèle linéaire régularisé L1_OLD.ipynb
+
+*.mat
