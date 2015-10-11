@@ -1,12 +1,16 @@
 package com.fulldeep.indexation;
 
 
+
+
+
 import com.fulldeep.indexation._
+import java.io.File
 // import spark.SparkContext
 // import SparkContext._
 
 
-object QueryParser{
+
 
 	  class QueryParser(val fileQuery:String, val fileRel:String) extends Serializable {
 			val parser = new ParserCISI_CACM()
@@ -43,4 +47,3 @@ object QueryParser{
 
 			}
 		}
-}

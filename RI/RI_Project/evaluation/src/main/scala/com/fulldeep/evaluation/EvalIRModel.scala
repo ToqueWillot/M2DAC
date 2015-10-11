@@ -1,6 +1,7 @@
-package com.fulldeep.indexation;
+package com.fulldeep.evaluation;
 
 import com.fulldeep.indexation._
+import com.fulldeep.modeles._
 import scala.util.Random
 
 

@@ -1,4 +1,4 @@
-name := "RI_Project-indexation"
+name := "RI_Project-utils"
 
 organization := "com.fulldeep"
 
@@ -17,7 +17,3 @@ resolvers ++= Seq(
             // other resolvers here
             "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/"
 )
-
-resolvers += Resolver.mavenLocal
-
-resolvers += "Typesafe Repo" at "http://repo.typesafe.com/typesafe/releases/"

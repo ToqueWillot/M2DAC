@@ -74,9 +74,18 @@ val indexer = new Index.Index("cacm",parser,stemmer)
 indexer.docs
 indexer.indexation(filename)
 
-val weighter = new Weighter.WeighterTF(indexer)
+val weighter = new Weighter.WeighterTF1(indexer)
 
 val query=" What articles exist which deal with TSS (Time Sharing System), an operating system for IBM computers?"
 val mapquery :Map[String,Int]= indexer.getMapWordOccurFromString(query)
 weighter.getWeightsForQuery(mapquery)
 indexer.getTfsForStem("techniqu")
+
+// test du query parser
+val fileQuery:String="../../data/cacm/cacm.qry"
+val fileRel:String="../../data/cacm/cacm.rel"
+val qp=new QueryParser.QueryParser(fileQuery,fileRel)
+val query1:Query=qp.nextQuery()
+
+val categorizer = new IRmodele.Vectoriel(indexer,weighter)
+categorizer.getRanking(mapquery)

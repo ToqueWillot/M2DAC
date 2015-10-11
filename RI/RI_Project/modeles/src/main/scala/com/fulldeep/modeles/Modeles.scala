@@ -1,4 +1,4 @@
-package com.fulldeep.indexation;
+package com.fulldeep.modeles;
 
 import com.fulldeep.indexation._
 
@@ -16,7 +16,8 @@ object Weighter {
         case None=>None
         case Some(seq)=>{
           val nbWords:Int = seq.map(a=>a._2).sum
-          Option(seq.map(a=>(a._1,a._2/nbWords.toFloat)))
+          //Option(seq.map(a=>(a._1,a._2/nbWords.toFloat)))
+          Option(seq.map(a=>(a._1,a._2.toFloat)))
         }
       }
     }
