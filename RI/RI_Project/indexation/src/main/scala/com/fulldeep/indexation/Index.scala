@@ -11,19 +11,37 @@ import java.io.FileInputStream
 import java.io.ObjectInputStream
 import java.io.PrintWriter
 
+
 object Index {
 
   class Index(val name:String, val parser:Parser, val textRepresenter:Stemmer) extends Serializable {
 
-    val file_index : File = new File("src/resources/"+name+"_index.csv")
+    //Big File
+    //index contains idDoc=>[(word=>tf)]
+    //inverted contains word=>[(idDoc=>tf)]
+
+    val file_index_name:String="../indexation/src/resources/cacm_index.csv"
+    val file_index : File = new File("../indexation/src/resources/"+name+"_index.csv")
     val index: RandomAccessFile = new RandomAccessFile(file_index, "rw")
 
-    val file_inverted : File = new File("src/resources/"+name+"_inverted.csv")
+    val file_inverted_name:String="../indexation/src/resources/"+name+"_inverted.csv"
+    val file_inverted : File = new File("../indexation/src/resources/"+name+"_inverted.csv")
     val inverted: RandomAccessFile = new RandomAccessFile(file_inverted, "rw")
 
-    val filenameDocs:String="src/resources/"+name+"_docs.csv"
-    val filenameStems:String="src/resources/"+name+"_stems.csv"
-    val filenameDocFrom:String="src/resources/"+name+"_docFrom.csv"
+    //Little File
+    //Contains the position for each word or doc in the big file
+    val filenameDocs:String="../indexation/src/resources/"+name+"_docs.csv"
+    val filenameStems:String="../indexation/src/resources/"+name+"_stems.csv"
+
+    //file contains
+    //links_succ contains idDoc=>[idDocS]
+    //links_pred contains idDoc=>[idDocP]
+    val filenameDocFrom:String="../indexation/src/resources/"+name+"_docFrom.csv"
+    val filenameLinksSucc:String="../indexation/src/resources/"+name+"_linksSucc.csv"
+    val filenameLinksPred:String="../indexation/src/resources/"+name+"_linksPred.csv"
+
+
+    //hashMap contains the positions
 
     val docs: scala.collection.mutable.Map[Int,(Int,Int)]=scala.collection.mutable.Map()
     if(new java.io.File(filenameDocs).exists ){
@@ -32,7 +50,7 @@ object Index {
           docs.put(tuple._1,(tuple._2,tuple._3))
         })
     }
-
+    println("indeex _docs ok")
     val stems: scala.collection.mutable.Map[String,(Int,Int)]=scala.collection.mutable.Map()
     if(new java.io.File(filenameStems).exists ){
         val file = scala.io.Source.fromFile(filenameStems, "UTF-8").getLines.toList.map(line=>{
@@ -40,9 +58,8 @@ object Index {
           stems.put(tuple._1,(tuple._2,tuple._3))
         })
     }
+    println("indeex _stems ok")
 
-
-    //TODO---
     val docFrom: scala.collection.mutable.Map[Int,(String,Int,Int)]=scala.collection.mutable.Map()
     if(new java.io.File(filenameDocFrom).exists ){
         val file = scala.io.Source.fromFile(filenameDocFrom, "UTF-8").getLines.toList.map(line=>{
@@ -51,14 +68,49 @@ object Index {
         })
     }
 
+    println("indeex _docFrom ok")
+    val linksSucc: scala.collection.mutable.Map[Int,Option[Seq[Int]]]=scala.collection.mutable.Map()
+    if(new java.io.File(filenameLinksSucc).exists ){
+        val file = scala.io.Source.fromFile(filenameLinksSucc, "UTF-8").getLines.toList.map(line=>{
+          val tuple = line.split(":")
+          val list :Option[Seq[Int]]= tuple.size match{
+            case 1 => None
+            case _ => Option(tuple(1).split(";").map(_.toInt).toSeq)
+          }
+          linksSucc.put(tuple(0).toInt,list)
+        })
+    }
+
+    println("indeex linkssucc ok")
+    val linksPred: scala.collection.mutable.Map[Int,Option[Seq[Int]]]=scala.collection.mutable.Map()
+    if(new java.io.File(filenameLinksPred).exists) {
+        val file = scala.io.Source.fromFile(filenameLinksPred, "UTF-8").getLines.toList.map(line=>{
+          val tuple = line.split(":")
+          val list :Option[Seq[Int]]= tuple.size match{
+            case 1 => None
+            case _ => Option(tuple(1).split(";").map(_.toInt).toSeq)
+          }
+          linksSucc.put(tuple(0).toInt,list)
+        })
+    }
+    println("indeex linksPred ok")
 
     //indexation : create files:  index inverted  and
     def indexation(filename:String):Unit={
+      val s =System.nanoTime
       if(!(new java.io.File(filenameDocs).exists)){ indexation_index(filename)}
+      println("docs terminé, time="+(System.nanoTime-s)/1e9+"s")
       if(!(new java.io.File(filenameStems).exists)){ indexation_inverted2(filename)}
+      println("stems terminé, time="+(System.nanoTime-s)/1e9+"s")
       if(!(new java.io.File(filenameDocFrom).exists)){ createDocFrom(filename)}
+      println("docFrom terminé, time="+(System.nanoTime-s)/1e9+"s")
+      if(!(new java.io.File(filenameLinksSucc).exists)){ createLinksSucc(filename)}
+      println("linksSucc terminé, time="+(System.nanoTime-s)/1e9+"s")
+      if(!(new java.io.File(filenameLinksPred).exists)){ createLinksPred(linksSucc)}
+      println("linksPred terminé, time="+(System.nanoTime-s)/1e9+"s")
     }
 
+    // functions create 3 file docfrom, LinksSucc, LinksPred
     def createDocFrom(filename:String):Unit={
       parser.init(filename)
       val pw = new PrintWriter(new File(filenameDocFrom))
@@ -72,6 +124,111 @@ object Index {
       }
       pw.close
     }
+
+
+    def createLinksSucc(filename:String):Unit={
+      parser.init(filename)
+      val pw = new PrintWriter(new File(filenameLinksSucc))
+      var doc = parser.nextDocument()
+      while(doc!=null){
+        val links:String = doc.get("links")
+        val line:String = doc.getId()+":"+links
+        var l=""
+
+        val list :Option[Seq[Int]] =  links.size match{
+          case 0 => None
+          case _ => {
+            try {
+              l=links
+              Option(links.split(";").map(_.toInt).toSeq)
+            }
+            catch{
+              case nfe:NumberFormatException => {
+                println("Error with doc"+doc.getId())
+                l=""
+                None
+              }
+            }
+
+          }
+        }
+        pw.write(doc.getId()+":"+l+"\n")
+        linksSucc.put(doc.getId().toInt ,list)
+        doc = parser.nextDocument()
+      }
+      pw.close
+    }
+
+
+    def createLinksPred(linksSucc:scala.collection.mutable.Map[Int,Option[Seq[Int]]]):Unit={
+       val listTmp:scala.collection.mutable.Map[Int,scala.collection.mutable.ListBuffer[Int]]=linksSucc.map(e=>(e._1,new scala.collection.mutable.ListBuffer[Int]))
+
+       linksSucc.toSeq.foreach(succ=>{
+          succ._2 match{
+            case Some(list)=>list.map(e=>listTmp(e)+=succ._1)
+            case None=> //nothing
+          }
+        })
+
+       val pw = new PrintWriter(new File(filenameLinksPred))
+       listTmp.foreach(e=>{
+           e._2.size match {
+            case 0=> {
+              linksPred.put(e._1,None)
+              val line:String = e._1.toString+":"
+              pw.write(line+"\n")
+            }
+            case _=> linksPred.put(e._1,Option(e._2.toSeq))
+            val line:String = e._1.toString+":"+e._2.mkString(";")
+            pw.write(line+"\n")
+           }
+         }
+       )
+       pw.close
+
+    }
+    def createInverted(index: RandomAccessFile):Unit={
+
+       //create the list that contains word (idDoc,tf)
+       val listTmp:scala.collection.mutable.Map[String,scala.collection.mutable.ListBuffer[(Int,Int)]]=scala.collection.mutable.Map()
+       println("ooook1")
+       docs.foreach{u=>{
+         val line = readRAF2(u._2._1,u._2._2,index)
+         val split=line.split(":")
+         val id:Int=split(0).toInt
+         split.size match{
+           case 1 =>
+           case _ => split(1).split(";").foreach(t=>{
+             val word=t.split(",")(0)
+             val nb = t.split(",")(1).toInt
+             listTmp.keySet.exists(_ == word) match{
+               case true => listTmp(word)+=(id->nb)
+               case false => listTmp+=(word->scala.collection.mutable.ListBuffer((id,nb)))
+             }
+           })
+         }
+       }
+     }
+
+       println("ooook2")
+       //write in stems and in the file inverted
+       val pw = new PrintWriter(new File(filenameStems))
+       inverted.setLength(0)
+       inverted.seek(0)
+       listTmp.foreach(word=>{
+            val curF:Int=inverted.getFilePointer().toInt
+            val line= word._1+":"+word._2.map(tup=>tup._1.toString+","+tup._2.toString).mkString(";")
+            val sizeLine:Int = line.size
+            inverted.writeChars(line+"\n")
+            stems.put(word._1 ,(curF, sizeLine))
+            pw.write(word._1+":"+curF.toString+":"+sizeLine.toString)
+           }
+       )
+       println("ooook3")
+       pw.close
+    }
+
+
 
     def indexation_index(filename:String):Unit={
       index.setLength(0);
@@ -96,6 +253,34 @@ object Index {
       })
       pw.close
     }
+
+    // def indexation_links(filename:String):Unit={
+    //   links_succ.setLength(0);
+    //   parser.init(filename)
+    //   links_succ.seek(0)
+    //
+    //   var doc = parser.nextDocument()
+    //   while(doc!=null){
+    //     val curF:Int=links_succ.getFilePointer().toInt
+    //     val line:String = doc.getId()+":"+doc.get("links_succ")
+    //     val sizeLine:Int = line.size
+    //
+    //     links_succ.writeChars(line+"\n")
+    //     linksPosition.put(doc.getId().toInt ,(curF, sizeLine))
+    //     doc = parser.nextDocument()
+    //   }
+    //   //write in file docs
+    //   val pw = new PrintWriter(new File(filenameLinks))
+    //   linksPosition.map(elem=>{
+    //     val txt:String=elem._1.toString+":"+elem._2._1.toString+":"+elem._2._2.toString+"\n"
+    //     pw.write(txt)
+    //   })
+    //   pw.close
+    // }
+
+    //TODO
+    //inverted en partant des index=> lire lignes une par une et ajouter dans la hashmapmotnb
+
 
     def indexation_inverted2(filename:String):Unit={
       parser.init(filename)
@@ -260,6 +445,27 @@ object Index {
         case None => None
       }
     }
+    // def getLinksSuccForDoc(doc:Int):Option[Seq[Int]] = {
+    //   linksPosition.get(doc) match{
+    //     case Some((begin,size))=> {
+    //       val str = readRAF2(begin,size,links_succ).split(":")
+    //       if(str.size<=1){
+    //         None
+    //       }
+    //       else{
+    //         Option(str(1).split(";").map(_.toInt).toSeq)
+    //       }
+    //     }
+    //     case None => None
+    //   }
+    // }
+    // val AllLinksSucc:Map[Int,Option[Seq[Int]]]=  indexer.linksPosition.map(elem=> elem._1, getLinksSuccForDoc(elem._1))
+    //
+    // val AllLinksPrec:Map[Int,Option[Seq[Int]]]={
+    //   val mapSucc  = AllLinksSucc.map(elem=> elem.map(id=>(id._1,id._2)))
+    //
+    //
+    // }
 
     //TODO--------------
     def getStrDoc(id:Int):Option[String]={

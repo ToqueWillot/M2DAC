@@ -58,6 +58,8 @@
 
 
 import com.fulldeep.indexation._
+import com.fulldeep.modeles._
+import com.fulldeep.evaluation._
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import java.io.RandomAccessFile
@@ -84,8 +86,43 @@ indexer.getTfsForStem("techniqu")
 // test du query parser
 val fileQuery:String="../../data/cacm/cacm.qry"
 val fileRel:String="../../data/cacm/cacm.rel"
-val qp=new QueryParser.QueryParser(fileQuery,fileRel)
+val qp=new QueryParser(fileQuery,fileRel)
 val query1:Query=qp.nextQuery()
 
 val categorizer = new IRmodele.Vectoriel(indexer,weighter)
 categorizer.getRanking(mapquery)
+
+val parserr= new ParserCISI_CACM()
+parserr.init(filename)
+val d = parserr.nextDocument()
+
+
+
+/* ----- Test TME1 ---- */
+
+import com.fulldeep.indexation._
+import java.io.FileInputStream
+val filename :String = "../../data/cacm/cacm.txt"
+//val filename :String = "../cacmTaille2Test.txt"
+
+val parser = new ParserCISI_CACM()
+val stemmer = new Stemmer()
+
+val indexer = new Index.Index("cacm",parser,stemmer)
+indexer.createInverted(indexer.index)
+
+indexer.createLinksSucc(filename)
+indexer.createLinksPred(indexer.linksSucc)
+indexer.indexation_index(filename)
+
+indexer.docs
+indexer.stems
+indexer.docFrom
+indexer.linksSucc
+indexer.linksPred
+
+indexer.docs
+indexer.stems
+indexer.docFrom
+indexer.linksSucc
+indexer.linksPred

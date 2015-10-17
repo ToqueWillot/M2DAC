@@ -15,7 +15,7 @@ object Weighter {
       index.getTfsForDoc(idDoc) match {
         case None=>None
         case Some(seq)=>{
-          val nbWords:Int = seq.map(a=>a._2).sum
+          //val nbWords:Int = seq.map(a=>a._2).sum
           //Option(seq.map(a=>(a._1,a._2/nbWords.toFloat)))
           Option(seq.map(a=>(a._1,a._2.toFloat)))
         }

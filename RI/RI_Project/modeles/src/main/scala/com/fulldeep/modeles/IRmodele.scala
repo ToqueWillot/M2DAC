@@ -44,4 +44,35 @@ object IRmodele {
 
   }
 
+  class LanguageModel(val index:Index.Index,val weighter:Weighter.Weighter) extends IRmodele {
+
+
+    def pmquery(query:Map[String,Int],doc:Map[String,Int]):Float={
+      val tailledoc=doc.map(_._2).sum
+      query.map(w=>{
+        doc(w) match {
+          case n=> n*math.log(n.toFloat/tailledoc)
+          case None=> 0.0f
+        }
+      }).sum
+    }
+    
+
+
+    def getScores(query: Map[String,Int],normalized : Boolean = false):Seq[(Int,Float)]={
+      normalized match {
+        case false => {
+          val queryWeight: Seq[(String,Float)]= weighter.getWeightsForQuery(query)
+
+
+        }
+        case true =>{
+
+        }
+      }
+
+    }
+
+  }
+
 }
