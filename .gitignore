@@ -21,6 +21,8 @@ RI/RI_Project/indexation/target/streams/$global/projectDescriptors/$global/strea
 
 RI/RI_Project/indexation/target/streams/$global/update/$global/streams/out
 
+recodata/
+
 *.xml
 
 *.cache

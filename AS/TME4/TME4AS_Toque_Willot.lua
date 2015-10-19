@@ -196,266 +196,30 @@ end
 --
 
 
----------------------------------------------------------------------------------------------------------------------------------------------------------------
----------------------------------------------------------------------------------------------------------------------------------------------------------------
----------------------------------------------------------------------------------------------------------------------------------------------------------------
------------------------------------------------------Commencement du TME 3 ------------------------------------------------------------------------------------
----------------------------------------------------------------------------------------------------------------------------------------------------------------
----------------------------------------------------------------------------------------------------------------------------------------------------------------
----------------------------------------------------------------------------------------------------------------------------------------------------------------
----------------------------------------------------------------------------------------------------------------------------------------------------------------
---Binome Florian Toqué et Paul Willot
---Master 2 DAC , UE AS (apprentissage statistique)
---Professeur Patrick Gallinari et Ludovic Denoyer
-
---TME3
---Exercice 1 implémentation de la fonction d'activation Requ et d'un model linéaire !!! :)
-
---1.1 implémentation de la fonction d'activation Requ
-
--- la fonction requ n'a pas de parametre on ne met donc pas a jour ses poids. (sa derivée en fonction de ses parametres est nulle)
-
-local ReQu, parent = torch.class('nn.ReQu', 'nn.Module')
-
-function ReQu:__init()
-   parent.__init(self)
-end
-
-function ReQu:updateOutput(input)
-   self.output = torch.pow(input,2)
-   self.inputIsPositive = input:ge(0):double() -- condition if de la fonction requ ( => probleme classif xor en non lineaire)
-   self.output:cmul(self.inputIsPositive)
-   return self.output
-end
-
-function ReQu:updateGradInput(input, gradOutput)
-   -- On veut le gradient du Loss en fonction de notre entrée (input).
-   -- grad input egal gradoutput * grad de la fonction d'erreur en fonction des x (inputs)
-   self.gradInput = input * 2
-   self.gradInput:cmul(self.inputIsPositive)
-   -- Ci dessous, gradOutput est le gradient du loss en fonction des
-   -- entrées du module suivant (ou sorties du module actuel)
-   self.gradInput:cmul(gradOutput)
-   return self.gradInput
-end
-
-
-
---1.2 implémentation de la fonction Lineaire
--- la fonction requ n'a pas de parametre on ne met donc pas a jour ses poids. (sa derivée en fonction de ses parametres est nulle)
-
-local Lineaire, Parent = torch.class('nn.Lineaire', 'nn.Module')
-
-function Lineaire:__init(inputSize, outputSize)
-   Parent.__init(self)
-   self.weight = torch.Tensor(outputSize, inputSize)
-   self.gradWeight = torch.Tensor(outputSize, inputSize)
-   self:reset()
-end
-
---fonction utilisée par le forward on calcul l'output
-function Lineaire:updateOutput(x)
-   if x:dim() == 1 then
-       self.output = self.weight * x -- si entrée = vecteur
-   else
-       self.output = x * self.weight:t() -- si entrée = matrice
-   end
-   return self.output
-end
-
-function Lineaire:updateGradInput(x, gradOutput)
-    -- Le gradient des sorties dune fonction lineaire en fonction des entrées est égal aux paramètres (theta*x)'/x'=theta d'où
-   self.gradInput = self.weight:transpose(1,2) * gradOutput
-   return self.gradInput
-end
-
---mise à jour des parametres
--- multiplication de gradoutput par (x :qui est la derivée de la fonction lineaire en fonction des parametres)
-function Lineaire:accGradParameters(x, gradOutput)
-   self.gradWeight = self.gradWeight + gradOutput:reshape(gradOutput:size(1),1) * x:reshape(1,x:size(1))
-   return self.gradWeight
-end
-
-    -- Initialisation des paramètres entre -1 et 1
-function Lineaire:reset()
-    self.weight = self.weight:uniform() * 2 - 1
-end
-
-
-
--- 1.3 test sur des données jouets de la fonction lineaire
-
--- ______classif_linear_2gauss
--- exemple of classification with lineaire. criterion = MSE (mean squared error) donées jouets
-local params = {{20,{3,3},1},{20,{-3,-3},-1}}
-local x,y = create_multiclass_xy (params) -- create data x (gaussian) and y (labels)
-labels={1,-1}
-colors={"blue","yellow"}
-colorsGrid={"grey","pink"}
-name="classif_lineaire_2gauss.png"
-
-nIter=1000
-ep=0.00001
-criterion=nn.MSECriterion()
-layer={2,1} --2 inputs (x[1], x[2]) one output (label)
-
-model = nn.Lineaire(layer[1],layer[2])
-for i = 1, nIter do
-   shuffle = torch.randperm(x:size(1))
-   for j = 1, x:size(1) do
-      id = shuffle[j]
-      input = x[id]
-      label = torch.Tensor{y[id]}
-      model:zeroGradParameters()
-      output = model:forward(input)
-      loss = criterion:forward(output, label)
-      df_doutput = criterion:backward(output, label)
-      df_dinput = model:backward(input, df_doutput)
-      model:updateParameters(ep)
-   end
-end
--- print(x)
--- print(y)
--- print(model:forward(x):sign())
-plot_decision(x,y,model,labels,colors,colorsGrid,name)
-
---la fonction lineaire separe classifie sans soucis les données jouets.
-
-
-
-
---exercice 2 xor kernel tricks___________________________
-local params = {{20,{3,3},1},
-                {20,{-3,-3},1},
-                {20,{-3,3},-1},
-                {20,{3,-3},-1}}
-local x,y = create_multiclass_xy (params)
-
-
---kernel_trick ajout de dimension aux données dentrées
---[[ le nombre de dimension de x ne permet pas au model lineaire
-de séparer l'espace comme il faut pour classifier les données correctement
-il faut rajouter une dimension x[1]*x[2] ainsi meme le modele lineaire peut classifier correctement les données.]]--
-local new_x= torch.cat(x, torch.cmul(x[{{},1}],x[{{},2}]) ,2)
-
-labels={1,-1}
-colors={"blue","yellow"}
-colorsGrid={"grey","pink"}
-name="classif_lineaire_XOR_kerneltrick.png"
-
-nIter=1000
-ep=0.00005
-criterion=nn.MSECriterion()
-layer={3,1} --3 inputs (x[1], x[2], x[1]*x[2]) one output (label)
-model = nn.Lineaire(layer[1],layer[2])
-
-for i = 1, nIter do
-   shuffle = torch.randperm(new_x:size(1))
-   for j = 1, new_x:size(1) do
-      id = shuffle[j]
-      input = new_x[id]
-      label = torch.Tensor{y[id]}
-      model:zeroGradParameters()
-      output = model:forward(input)
-      loss = criterion:forward(output, label)
-      df_doutput = criterion:backward(output, label)
-      df_dinput = model:backward(input, df_doutput)
-      model:updateParameters(ep)
-   end
-end
--- print(new_x)
--- print(y)
--- print(model:forward(new_x):sign())
-
-
-plot_decision3dim(new_x,y,model,labels,colors,colorsGrid,name)
---A laide du kernel trick la fonction linéaire arrive sans soucis à classifié lensemble des points
-
-
-
--- 1.3 Résolution du XOR sans kerneltrick( reseau de neuronnes à trois couche lineaire, requ, lineaire)
-
--- ______data xor
-local params = {{20,{3,3},1},
-                {20,{-3,-3},1},
-                {20,{-3,3},-1},
-                {20,{3,-3},-1}}
-local x,y = create_multiclass_xy (params)
-
-labels={1,-1}
-colors={"blue","yellow"}
-colorsGrid={"grey","pink"}
-name="classif_XOR_nonLineaire.png"
-
-nIter=2000
-ep=0.00001
-criterion=nn.MSECriterion()
-layer1={2,3} --2 inputs (x[1], x[2]) one output (label)
-layer3={3,1}
-
-local couche1 = nn.Lineaire(layer1[1],layer1[2])
-local couche2 = nn.ReQu()
-local couche3 = nn.Lineaire(layer3[1],layer3[2])
-for i = 1, nIter do
-   shuffle = torch.randperm(x:size(1))
-   for j = 1, x:size(1) do
-      id = shuffle[j]
-      input = x[id]
-      label = torch.Tensor{y[id]}
-      couche1:zeroGradParameters()
-      couche2:zeroGradParameters()
-      --forward pour chaque couche
-      output1 = couche1:forward(input)
-      output2 = couche2:forward(output1)
-      output3 = couche3:forward(output2)
-      --loss et backward du criterion pour avoir derive du loss en fonction de son output
-      loss = criterion:forward(output3, label)
-      df_doutput3 = criterion:backward(output3, label)
-
-      --propagation du gradient de l'erreur sur les couches précédentes
-      df_dinput3 = couche3:backward(output2, df_doutput3)
-      df_dinput2 = couche2:backward(output1, df_dinput3)
-      df_dinput1 = couche1:backward(input, df_dinput2)
-
-      couche1:updateParameters(ep)
-      couche3:updateParameters(ep)
-   end
-end
-
---
--- print(x)
--- print(y)
-plot_decision3couches(x,y,couche1,couche2,couche3,labels,colors,colorsGrid,name)
-
---on remarque ici que l'une des parties est mal classifié ceci est du au fait que la fonction requ mette à 0 les valeurs negatives.
--- Lors de la classification une partie des points obtient le label 0 qui n'existe pas. la back propagation ne permet pas
---de mettre a jour les poids etant donné que la derivée de la fonction d'erreur en fonction des poids est nulle.
-
-
-
-
-
 
 --------TME4
+require 'nn'
+mnist = require 'mnist'
 
-local mnist = require 'mnist'
 
-local trainset = mnist.traindataset()
-local testset = mnist.testdataset()
+--Data mnist
+trainset = mnist.traindataset()
+testset = mnist.testdataset()
 
 print(trainset.size) -- to retrieve the size
 print(testset.size) -- to retrieve the size
 
-local ex = trainset[i]
-local x = ex.x -- the input (a 28x28 ByteTensor)
-local y = ex.y -- the label (0--9)
+x_train = trainset.data -- the input (a 28x28 ByteTensor)
+y_train = trainset.label -- the label (0--9)
+
+x_test = testset.data -- the input (a 28x28 ByteTensor)
+y_test = testset.label -- the label (0--9)
 
 
+--Function to resize a matrix
 --1 image 28x28 => 14x14
-
 sm=4
 mat = torch.rand(sm, sm)
-
 function resizeMat(mat)
   new_mat=torch.Tensor(mat:size(1)/2,mat:size(2)/2)
   for i=0,mat:size(1)-1,2 do
@@ -467,14 +231,86 @@ function resizeMat(mat)
 end
 
 
-function keepCategories(list,x,y) do
-  for i=1,list:size(1) do
-    local selected = indices[y:eq(list[i])]
-    new_x:add(x(selected))
-    new_y:add(y(selected))
-  end
-  return new_x,new_y
+--todo
+-- function keepCategories(list,x,y) do
+--   for i=1,list:size(1) do
+--     local selected = indices[y:eq(list[i])]
+--     new_x:add(x(selected))
+--     new_y:add(y(selected))
+--   end
+--   return new_x,new_y
+-- end
+
+--todo
+
+-- TRAIN function gradient descent
+function train(mlp, criterion, data, labels, lr, nIter)
+   local lr = lr or 1e-5
+   local nIter = nIter or 100
+   for i = 1,nIter do
+      mlp:zeroGradParameters()
+      y = mlp:forward(data)
+      loss = criterion:forward(y,labels)
+      df_do = criterion:backward(y,labels)
+      df_di = mlp:backward(data, y)
+      mlp:updateParameters(lr)
+   end
 end
+
+-- Layers creation
+layerSize = {28*28,
+	     14*14,
+	     50,
+	     25,
+	     28*28}
+
+layers = {}
+for i=1,(#layerSize)-1 do
+   table.insert(layers, nn.Linear(layerSize[i],layerSize[i+1]))
+end
+
+
+-- Auto_encoders creation
+autoEncoders = {}
+for i=1,#layers do
+   autoEncoder = nn.Sequential()
+   autoEncoder:add(layers[i])
+   autoEncoder:add(nn.Tanh())
+   autoEncoder:add(nn.Linear(layerSize[i+1], layerSize[i]))
+   table.insert(autoEncoders, autoEncoder)
+end
+
+
+-- Auto_encoders training
+mse = nn.MSECriterion()
+stack = nn.Sequential()
+for i=1,(#autoEncoders)-1 do
+   print(i)
+   x = stack:forward(trainData)
+   train(autoEncoders[i], mse, x, x)
+   stack:add(layers[i])
+   stack:add(nn.Tanh())
+end
+i = (#autoEncoders)
+x = stack:forward(trainData)
+train(autoEncoders[i], mse, x, x)
+
+
+-- Add the final classifier
+classifier = nn.Linear(layerSize[i], nClass)
+nll = nn.ClassNLLCriterion()
+x = stack:forward(trainData)
+train(classifieur, nll, x, trainLabels)
+stack:add(classifier)
+
+
+-- Finetuning ( train the model already train until the classifier )
+train(stack, nll, trainData, trainLabels, 1e-5, 100)
+
+
+
+
+
 
 function auto_encoder(x,size) do
 
