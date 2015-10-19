@@ -1,225 +1,84 @@
-require 'torch'
-require 'optim'
+--TME 4 AS - Auto Encodeurs
+
+--binome Florian Toqué et Paul Willot
+
+
 require 'nn'
-require 'gnuplot'
-require 'math'
-
-
---__________Gaussian generation main function(create_multiclass_xy)_____________
-
-function create_x(n,position)
-  x=torch.randn(n,#position)
-  for i=1,#position do
-      x[{{},{i}}]=x[{{},{i}}]+position[i]
-  end
-  return x
-end
-
-function create_x_y(n,position,label)
-  x=create_x(n,position)
-  y=torch.ones(n)*label
-  return x,y
-end
-
--- params = tensor(tensor(n,position,label))
---have to concat with axis 1 for x!!!!
-function create_multiclass_xy(params)
-  local x,y = create_x_y(params[1][1],params[1][2],params[1][3])
-  for i = 2,#params do
-    xx,yy=create_x_y(params[i][1],params[i][2],params[i][3])
-    x = x:cat(xx,1)
-    y = y:cat(yy)
-  end
-  return x,y
-end
-
-
--- --__________test gaussian generation_________________
--- -- local n=3; local position={3,3}
--- -- local x_test = create_x(n,position);
--- -- print(x_test)
--- --
--- -- local n=3; local position={3,3}; label=4
--- -- local x,y = create_x_y(n,position,label);
--- -- print(x)
--- -- print(y)
--- --
--- -- local params = {{3,{3,3},4},{3,{-3,-3},2}}
--- -- local x,y = create_multiclass_xy (params)
--- -- print(x)
--- -- print(y)
---
---
---
--- --Plot the world___________________________________
-
-function toPlot2D(x,label,color)
-   return {label, x[{{},1}], x[{{},2}], 'p ls 1 lc rgb "'..color..'"'}
-end
-
-
-function plot_points(x, y, labels, colors, name)
-    toPlot = {}
-    indices = torch.linspace(1,(#y)[1],(#y)[1]):long()
-    for i = 1, #labels do
-       local selected = indices[y:eq(labels[i])]
-       table.insert(toPlot, toPlot2D(x:index(1, selected), "classe "..labels[i], colors[i]))
-    end
-    gnuplot.pngfigure(name)
-    gnuplot.plot(toPlot)
-    gnuplot.close()
-end
-
-function getPointsGrid(x,nbPoints)
-   local xmin = x:min(1)[1]
-   local xmax = x:max(1)[1]
-   local axe1 = torch.linspace(xmin[1], xmax[1],nbPoints)
-   local axe2 = torch.linspace(xmin[2], xmax[2],nbPoints)
-   local gridX = torch.zeros(axe1:size(1) * axe2:size(1),2)
-   i = 1
-   for i1 = 1, axe1:size(1) do
-      for i2 = 1, axe2:size(1) do
-         gridX[i][1] = axe1[i1]
-         gridX[i][2] = axe2[i2]
-         i = i + 1
-      end
-   end
-   return gridX
-end
-
-
-function getGridtoPlot(model,x,labels,colorsGrid)
-  toPlot = {}
-  xGrid = getPointsGrid(x,100)
-  xGridInputs = xGrid
-  yGrid = model:forward(xGrid)
-  yGrid = yGrid:sign()
-  indices = torch.linspace(1,yGrid:size(1),yGrid:size(1)):long()
-  for i = 1, #labels do
-     selected = indices[yGrid:eq(labels[i])]
-     table.insert(toPlot, toPlot2D(xGrid:index(1, selected), "grid "..labels[i], colorsGrid[i]))
-  end
-  return toPlot
-end
-
-function getGridtoPlot3couches(couche1,couche2,couche3,x,labels,colorsGrid)
-  toPlot = {}
-  xGrid = getPointsGrid(x,100)
-  xGridInputs = xGrid
-  local yGrid11 = couche1:forward(xGrid)
-  local yGrid22 = couche2:forward(yGrid11)
-  local yGrid33 = couche3:forward(yGrid22)
-  local yGrid = yGrid33:sign()
-
-  indices = torch.linspace(1,yGrid:size(1),yGrid:size(1)):long()
-  for i = 1, #labels do
-     local selected = indices[yGrid:eq(labels[i])]
-     table.insert(toPlot, toPlot2D(xGrid:index(1, selected), "grid "..labels[i], colorsGrid[i]))
-  end
-  return toPlot
-end
-
-
-function getPointstoPlot(x,y,labels,colors)
-  toPlot = {}
-  indices = torch.linspace(1,(#y)[1],(#y)[1]):long()
-  for i = 1, #labels do
-     selected = indices[y:eq(labels[i])]
-     table.insert(toPlot, toPlot2D(x:index(1, selected), "classe "..labels[i], colors[i]))
-  end
-  return toPlot
-end
-
-function plot_decision(x,y,model,labels,colors,colorsGrid,name)
-  local toPlot = getGridtoPlot(model,x,labels,colorsGrid)
-  local toPlot2 = getPointstoPlot(x,y,labels,colors)
-  for i=1,#toPlot2 do
-    table.insert(toPlot, toPlot2[i])
-  end
-  gnuplot.pngfigure(name)
-  gnuplot.plot(toPlot)
-  gnuplot.close()
-end
-
-function plot_decision3couches(x,y,couche1,couche2,couche3,labels,colors,colorsGrid,name)
-  local toPlot = getGridtoPlot3couches(couche1,couche2,couche3,x,labels,colorsGrid)
-  local toPlot2 = getPointstoPlot(x,y,labels,colors)
-  for i=1,#toPlot2 do
-    table.insert(toPlot, toPlot2[i])
-  end
-  gnuplot.pngfigure(name)
-  gnuplot.plot(toPlot)
-  gnuplot.close()
-end
-
-function getGridtoPlot3dim(model,x,labels,colorsGrid)
-  toPlot = {}
-  xGrid = getPointsGrid(x,100)
-  xGridInputs = torch.cat(xGrid, torch.cmul(xGrid[{{},1}], xGrid[{{},2}]),2)
-  yGrid = model:forward(xGridInputs)
-  yGrid = yGrid:sign()
-  indices = torch.linspace(1,yGrid:size(1),yGrid:size(1)):long()
-  for i = 1, #labels do
-     local selected = indices[yGrid:eq(labels[i])]
-     table.insert(toPlot, toPlot2D(xGrid:index(1, selected), "grid "..labels[i], colorsGrid[i]))
-  end
-  return toPlot
-end
-
-function plot_decision3dim(x,y,model,labels,colors,colorsGrid,name)
-  local toPlot = getGridtoPlot3dim(model,x,labels,colorsGrid)
-  local toPlot2 = getPointstoPlot(x,y,labels,colors)
-  for i=1,#toPlot2 do
-    table.insert(toPlot, toPlot2[i])
-  end
-  gnuplot.pngfigure(name)
-  gnuplot.plot(toPlot)
-  --gnuplot.plot(toPlot2)
-  gnuplot.close()
-end
-
--- --test plot______________________
--- local params = {{10,{3,3},1},{10,{-3,-3},-1}}
--- local xxx,yyy = create_multiclass_xy (params)
--- labels={1,-1}
--- colors={"red","blue"}
--- name="test points.png"
---
--- -- print(xxx)
--- -- print(yyy)
--- -- plot_points(xxx,yyy,labels,colors,name)
---
--- -- gridX=getRegionGrid(xxx,80)
--- -- y = torch.ones(gridX:size(1))
--- -- print("taillegridX"..gridX:size(1))
--- -- plot_points(gridX,y,{1},{"red"},"gridred.png")
---
-
-
-
---------TME4
-require 'nn'
+require 'image'
 mnist = require 'mnist'
 
+-- Apprentissage par descente de gradient
+function fit(mlp, criterion, data, labels, lr, nIter)
+   local lr = lr or 1e-1
+   local nIter = nIter or 1000
+   local choices = torch.LongTensor((#data)[1])
+   for i = 1,nIter do
+      mlp:zeroGradParameters()
+      --on shufflise les datas
+      choices:random((#data)[1])
+      local x = data:index(1,choices)
+      local y = labels:index(1,choices)
+      --calcul du y chapeau (prediction)
+      local pred = mlp:forward(x)
+      --calcul de l'erreur entre pred et y*
+      local loss = criterion:forward(pred,y)
+      --gradient de l'erreur par rapport à pred
+      local df_do = criterion:backward(pred,y)
+      --propagation du gradient de l'erreur sur  la fonction
+      -- linear d'entrée
+      local df_di = mlp:backward(x, df_do)
+      -- on modifie les poids suivant le learning rate sur lensemble des couches
+      mlp:updateParameters(lr)
+      if i % 100 == 0 then
+	        print(i,loss)
+      end
+   end
+end
 
---Data mnist
+--fonction permettant de creer la suite des decoder à une certaine
+-- profondeur depuis decoders (qui les contient tous)
+function buildDeepDecoder(decoders, depth)
+   local decoder = nn.Sequential()
+   for i = depth,1,-1 do
+      decoder:add(decoders[i])
+      decoder:add(nn.Tanh())
+   end
+   return decoder
+end
+
+--permet de visualiser les features apprises
+function visualizeAutoEncoding(deepEncoder, deepDecoder, data)
+   local depth =  (#deepEncoder.modules)/2
+   local imgSize = math.sqrt((#data)[2])
+   for i = 1,(#data)[1] do
+      local img = data[i]:reshape(imgSize,imgSize)
+      image.save("image_input".. depth .."_" .. i .. ".png", img)
+      --decoding sur l'encoding de limage data[i] a la profondeur depth
+      img = deepDecoder:forward(deepEncoder:forward(data[i]))
+      img = img:reshape(imgSize,imgSize)
+      image.save("image_output".. depth .. "_" .. i ..".png", img)
+   end
+end
+
+function visualizeDecoding(deepDecoder, code)
+   local img = deepDecoder:forward(code)
+   local imgSize = math.sqrt((#img)[1])
+   img = img:reshape(imgSize,imgSize)
+   return img
+end
+
+----------------------------------------------------------------------
+-- Données mnist
 trainset = mnist.traindataset()
 testset = mnist.testdataset()
 
-print(trainset.size) -- to retrieve the size
-print(testset.size) -- to retrieve the size
 
-x_train = trainset.data -- the input (a 28x28 ByteTensor)
-y_train = trainset.label -- the label (0--9)
+classes = torch.range(0,9)
+nClass = (#classes)[1]
 
-x_test = testset.data -- the input (a 28x28 ByteTensor)
-y_test = testset.label -- the label (0--9)
-
-
---Function to resize a matrix
---1 image 28x28 => 14x14
-sm=4
-mat = torch.rand(sm, sm)
+--fonction qui resize la matrice en la divisant par 2 28*28=>14*14
+-- et qui divise tous les "pixel" par 256 pour avoir des valeurs
+-- comprisent entre 0 et 1
 function resizeMat(mat)
   new_mat=torch.Tensor(mat:size(1)/2,mat:size(2)/2)
   for i=0,mat:size(1)-1,2 do
@@ -230,120 +89,115 @@ function resizeMat(mat)
   return new_mat * (1.0/256)
 end
 
-
---todo
--- function keepCategories(list,x,y) do
---   for i=1,list:size(1) do
---     local selected = indices[y:eq(list[i])]
---     new_x:add(x(selected))
---     new_y:add(y(selected))
---   end
---   return new_x,new_y
--- end
-
---todo
-
--- TRAIN function gradient descent
-function train(mlp, criterion, data, labels, lr, nIter)
-   local lr = lr or 1e-5
-   local nIter = nIter or 100
-   for i = 1,nIter do
-      mlp:zeroGradParameters()
-      y = mlp:forward(data)
-      loss = criterion:forward(y,labels)
-      df_do = criterion:backward(y,labels)
-      df_di = mlp:backward(data, y)
-      mlp:updateParameters(lr)
-   end
+--creation des ensembles testsData et trainData
+nEx = testset.size
+testsData = torch.zeros(nEx, 14*14)
+testsLabels = torch.zeros(nEx)
+for i=1,nEx do
+   testsLabels[i] = testset.label[i] + 1
+   testsData[i] = resizeMat(testset.data[i])
 end
 
--- Layers creation
-layerSize = {28*28,
-	     14*14,
-	     50,
-	     25,
-	     28*28}
+nEx = trainset.size
+trainData = torch.zeros(nEx, 14*14)
+trainLabels = torch.zeros(nEx)
+for i=1,nEx do
+   trainLabels[i] = trainset.label[i] + 1
+   trainData[i] = resizeMat(trainset.data[i])
+end
 
-layers = {}
+----------------------------------------------------------------------
+-- Liste des tailles des différents layers
+layerSize = {(#trainData)[2],
+	     150,
+	     100,
+	     60,
+	     30,
+	     20
+             }
+
+-- Constitution des layers encoders et decoders
+--un autoencoder est formé comme cela:
+-- nn.sequential->nn.linear(encoder)->tanh->linear(decoder)->tanh
+encoders = {}
+decoders = {}
 for i=1,(#layerSize)-1 do
-   table.insert(layers, nn.Linear(layerSize[i],layerSize[i+1]))
+   table.insert(encoders, nn.Linear(layerSize[i],layerSize[i+1]))
+   table.insert(decoders, nn.Linear(layerSize[i+1],layerSize[i]))
 end
 
-
--- Auto_encoders creation
+-- Constitution des autoencoders
 autoEncoders = {}
-for i=1,#layers do
+for i=1,#encoders do
    autoEncoder = nn.Sequential()
-   autoEncoder:add(layers[i])
+   autoEncoder:add(encoders[i])
    autoEncoder:add(nn.Tanh())
-   autoEncoder:add(nn.Linear(layerSize[i+1], layerSize[i]))
+   autoEncoder:add(decoders[i])
+   autoEncoder:add(nn.Tanh())
    table.insert(autoEncoders, autoEncoder)
 end
 
-
--- Auto_encoders training
+-- Entrainement des AutoEncodeurs et stacking des couches
+-- moindre carré loss
 mse = nn.MSECriterion()
-stack = nn.Sequential()
-for i=1,(#autoEncoders)-1 do
-   print(i)
-   x = stack:forward(trainData)
-   train(autoEncoders[i], mse, x, x)
-   stack:add(layers[i])
-   stack:add(nn.Tanh())
+-- création de lencoder entier "deepEncoder"
+deepEncoder = nn.Sequential()
+for i=1,(#autoEncoders) do
+   print("AutoEncodeur numéro  ", i)
+   x = deepEncoder:forward(trainData)
+   -- on entraine  l' autoencodeur i avec x contenant la
+   -- (derniere) sortie du forward des encoders précédents
+   fit(autoEncoders[i], mse, x, x, 1e-1, 100)
+   -- on ajoute dans le deepencoder l'encoder i à présent fitté plus
+   -- un nn tanh
+   deepEncoder:add(encoders[i])
+   deepEncoder:add(nn.Tanh())
+   -- visualization de l'auto encoding avec le deepencoder à la ieme
+   -- couche(sur les images 6,7,8,9,10 )
+   visualizeAutoEncoding(deepEncoder, buildDeepDecoder(decoders, i), trainData[{{6,10}}])
 end
-i = (#autoEncoders)
-x = stack:forward(trainData)
-train(autoEncoders[i], mse, x, x)
+
+-- Entrainement du classifieur lineaire (sortie dernier encodeur vers
+-- prediction de label)
+print("Clf:")
+classifier = nn.Linear(layerSize[#layerSize], nClass)
+-- CrossEntropyCriterion combine nll(negativeloglikelihood et
+-- logsoftmax) criterion multiclasse
+cec = nn.CrossEntropyCriterion()
+--forward du traindata sur le deepEncoder puis fit du classifier sur
+-- cette sortie
+x = deepEncoder:forward(trainData)
+fit(classifier, cec, x, trainLabels, 1e-1, 100)
+
+--Consitution du classifieur final
+deepClassifier = nn.Sequential()
+deepClassifier:add(deepEncoder)
+deepClassifier:add(classifier)
 
 
--- Add the final classifier
-classifier = nn.Linear(layerSize[i], nClass)
-nll = nn.ClassNLLCriterion()
-x = stack:forward(trainData)
-train(classifieur, nll, x, trainLabels)
-stack:add(classifier)
-
-
--- Finetuning ( train the model already train until the classifier )
-train(stack, nll, trainData, trainLabels, 1e-5, 100)
-
-
-
-
-
-
-function auto_encoder(x,size) do
-
-  criterion=nn.MSECriterion()
-  local couche1 = nn.Lineaire(x:size(1),size)
-  local couche2 = nn.Tanh()
-  local couche3 = nn.Lineaire(size,x:size(1))
-
-  for i = 1, nIter do
-     shuffle = torch.randperm(x:size(1))
-     for j = 1, x:size(1) do
-        id = shuffle[j]
-        input = x[id]
-        label = torch.Tensor{y[id]}
-        couche1:zeroGradParameters()
-        couche2:zeroGradParameters()
-        --forward pour chaque couche
-        output1 = couche1:forward(input)
-        output2 = couche2:forward(output1)
-        output3 = couche3:forward(output2)
-        --loss et backward du criterion pour avoir derive du loss en fonction de son output
-        loss = criterion:forward(output3, label)
-        df_doutput3 = criterion:backward(output3, label)
-
-        --propagation du gradient de l'erreur sur les couches précédentes
-        df_dinput3 = couche3:backward(output2, df_doutput3)
-        df_dinput2 = couche2:backward(output1, df_dinput3)
-        df_dinput1 = couche1:backward(input, df_dinput2)
-
-        couche1:updateParameters(ep)
-        couche3:updateParameters(ep)
-     end
-
-  return couche1,couche2,couche3
-
+--Visualiser un decodage de la dernière couche:
+codeSize = layerSize[#layerSize]
+for i = 1,codeSize do
+   code = torch.zeros(codeSize)
+   code[i] = 1
+   img = visualizeDecoding(buildDeepDecoder(decoders, #decoders), code)
+   image.save("decoding" .. i .. ".png", img)
 end
+
+--FineTuning
+--A present que l'on a ajusté les poids de chaque layer on fit
+-- l'ensemble du réseau.
+print("Fine tuning...en cours")
+fit(deepClassifier, cec, trainData, trainLabels, 1e-1, 10)
+
+-- Evaluation en train
+pred = deepClassifier:forward(trainData)
+__, pred = torch.max(pred,2)
+print("score sur data train:")
+print(torch.add(trainLabels:long(),-pred):eq(0):double():mean())
+
+-- Evaluation en test
+pred = deepClassifier:forward(testsData)
+__, pred = torch.max(pred,2)
+print("score sur data test:")
+print(torch.add(testsLabels:long(),-pred):eq(0):double():mean())
