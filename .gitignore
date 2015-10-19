@@ -35,6 +35,8 @@ RI/RI_Project/indexation/target/.history
 
 target/
 
+recodata/
+
 *.zip
 
 Scene/
