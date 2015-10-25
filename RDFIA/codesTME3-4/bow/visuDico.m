@@ -3,8 +3,7 @@ function [ patchmin ] = visuDico( nomDico ,  baseDir , baseDirDes)
 
 load(nomDico);
 
-clusters=bestCenters
-K = size(clusters,1);
+K = size(bestCentres,1);
 
 s=16;
 delta=8;
@@ -51,7 +50,7 @@ for index=1:15
         
         
         N = size(y,2);
-        M =  size(clusters,1);
+        M =  size(bestCentres,1);
         D= zeros(N,M);
         
         A = zeros(N,1);
@@ -62,10 +61,10 @@ for index=1:15
         
         C = zeros(1,M);
         for i=1:M
-            C(1,i) = norm(clusters(i,:)).^2;
+            C(1,i) = norm(bestCentres(i,:)).^2;
         end
         C = repmat(C,N,1);
-        B = y' * clusters';
+        B = y' * bestCentres';
         
         D = A + C - 2*B;
         

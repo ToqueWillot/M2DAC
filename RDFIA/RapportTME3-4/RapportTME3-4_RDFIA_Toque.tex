@@ -8,48 +8,65 @@
 \usepackage{float}
 
 
-\title{Calcul de représentation d'images et apprentissage supervisé}
-
 \author{Florian Toqué}
 
 \date{20 Octobre, 2015}
+
+
+\title{Calcul de représentation d'images et apprentissage supervisé\\}
+
 
 \begin{document}
 
 \maketitle
 
+
+
 \selectlanguage{francais}
 \begin{abstract}
 
 
-Ce rapport porte sur un travail effectué au cours de l'UE RDFIA du Master informatique spécialité Imagerie de l'université Pierre et Marie Curie (Paris). Le travail réalisé consiste à mettre en place un système de classification d’images par apprentissage supervisé. Une fois appris ce système de classification est en mesure d’affecter une des 15 catégories sémantiques à une image de test donnée. Dans ce rapport nous expliquons une des parties nécessaire à ce système qui est la représentation d'image en Bag of Words et l'apprentissage supervisé (SVM). 
+Ce rapport porte sur un travail effectué au cours de l'UE RDFIA du Master informatique spécialité Imagerie de l'université Pierre et Marie Curie (Paris). Le travail réalisé consiste à mettre en place un système de classification d’images par apprentissage supervisé. Une fois appris ce système de classification est en mesure d’affecter une des 15 catégories sémantiques à une image de test donnée. Dans ce rapport nous expliquons une des parties nécessaires à ce système qui est la représentation d'image en Bag of Words et l'apprentissage supervisé (SVM). 
 \end{abstract}
-
+\newpage
 \section{Introduction}
-Lors de ce projet nous avons implémenté deux parties, le calcul des BoW qui représentent les images et la formation d'un classifieur multi-classe (SVM en un contre tous) .
+Lors de ce projet nous avons implémenté deux parties, le calcul des BoW qui représentent les images et la formation d'un classifieur multi-classe (SVM en un contre tous).
 
 
 \section{Calcul de représentation d'image: le modèle Bag of Words (BoW)}
-Afin de classifier des images il est tout d'abord nécessaire de les représenter de manière uniforme. La technique employée ici est de représenter chaque image sous forme de Bag of Words. Chaque image est tout d'abord représentée par un ensemble de SIFTS(contenant 128 mots visuels) calculés au préalable, nous avons aussi calculé à l'aide d'un algorithme de clustering, un dictionnaire contenant les mots les plus représentatifs de l'ensemble des images que nous avons à notre disposition. Le principe est d'assigner un poids à chaque mots de ce dictionnaire pour que le vecteur de mots visuels représente au mieux une image. 
+Afin de classifier des images il est tout d'abord nécessaire de les représenter de manière uniforme. La technique employée ici est de représenter chaque image sous forme de Bag of Words. Chaque image est tout d'abord représentée par un ensemble de SIFTS  calculés au préalable, nous avons aussi calculé à l'aide d'un algorithme de clustering, un dictionnaire contenant les mots visuels les plus représentatifs de l'ensemble des images que nous avons à notre disposition. On représentera alors une image sous forme de vecteur (histogramme contenant l'importance de chaque mot visuel sous forme de scalaire pour définir l'image). 
 \subsection{Visualisation du dictionnaire visuel}
-Le dictionnaire visuel contient l'ensemble des "mots visuels" les plus représentatifs de l'ensemble de la base 15-scenes, calculé dans un travail précédent à l'aide de l'algorithme du KMeans. Voici sa visualisation:\todo{mettre limage du dictionnaire visuel} ici
-
+Le dictionnaire visuel contient l'ensemble des "mots visuels" (1000) les plus représentatifs de l'ensemble de la base 15-scenes, calculé dans un travail précédent à l'aide de l'algorithme du KMeans. Voici sa visualisation:\\
+\begin{center}
+\includegraphics[scale=0.5]{dico}
+\end{center}
 \subsection{Calcul de BoW sur des images et visualisation des résultats}
 Nous voulons représenter les images d'une manière uniforme pour pouvoir les classifier.\\
-Pour ce faire deux étapes sont nécessaires, la première est le cooding, cette étape consiste à calculé pour chaque SIFT de l'image le mot visuel le plus similaire à celui dans le dictionnaire. Une fois cette étape effectuée il suffit de faire l'aggrégation (pooling) des mots trouvés pour chaque SIFTS et de diviser l'ensemble par le nombre de SIFTS de l'images. Nous obtenons alors la représentation d'une image sous forme de vecteur de la taille du dictionnaire contenant à l'emplacement de chaque mot visuel son importance pour la représentation de l'image sous forme de scalaire.\\
-Voici la visualisation d'une image et de ses mots les plus fréquents ainsi que leurs localisations:\todo{mettre image testBowImage}ici
+Pour ce faire deux étapes sont nécessaires, la première est le cooding, cette étape consiste à calculé pour chaque SIFT de l'image le mot du dictionnaire le plus similaire. Une fois cette étape effectuée il suffit de faire l'aggrégation (pooling) du nombre de mots trouvés pour chaque SIFTS et de diviser l'ensemble par le nombre de SIFTS de l'images. Nous obtenons alors la représentation d'une image sous forme de vecteur (BOW) de la taille du dictionnaire contenant à l'emplacement de chaque mot visuel son importance pour la représentation de l'image sous forme de scalaire.
+\\
+Voici la visualisation de l'histogramme d'une image, le mot 780 à 4,5\% dans l'image, le mot 70, 2\%:\\
+\begin{center}
+\includegraphics[scale=0.5]{bowHisto}
+\end{center}
 
+Voici la visualisation d'une image, de ses 8 mots les plus fréquents ainsi que leurs localisations:\\
+\begin{center}
+\includegraphics[scale=0.5]{bowLoc}
+\end{center}
 \subsection{Calcul de l’ensemble des BoW sur la base}
-Afin de classifier les 4485 images de la bases nous devons calculer leurs BoW. Pour ce faire nous faisons comme précedemment pour toutes les images de la base en stockant leurs BoW dans un fichier.
+Afin de classifier les 4485 images de la bases nous devons calculer leurs BoW. Pour ce faire nous faisons comme précédemment pour toutes les images de la base en stockant leurs BoW dans un fichier.
 
 
 
 \section{Apprentissage supervisé pour la classification sémantique d'images}
-Chaque image est représentée sous forme d'un BoW qui est un vecteur de taille 1000. Pour classifier chaque image parmis les 15 catégories possible nous avons utiliser l'algorithme d'apprentissage SVM. Nous allons tout dabord présenter cet algorithme de classification pour des données binaires, puis nous expliquerons comment il est utilisé pour classifier des données multi-classes.
+Chaque image est représentée sous forme d'un BoW qui est un vecteur de taille 1000. Pour classifier chaque image parmis les 15 catégories possible nous avons utiliser l'algorithme d'apprentissage SVM. Nous allons tout d'abord présenter cet algorithme de classification pour des données binaires, puis nous expliquerons comment il est utilisé pour classifier des données multi-classes.
 \subsection{Apprentissage des SVM binaires}
-Un classifieur SVM(support vector machines) est un algorithme d(apprentissage linéaire. Il permet de créer une frontière entre deux classes différentes tout comme un algorithme de regression logistique. L'avantage est qu'en plus de séparer l'espace binaire en deux espaces distincts, il maximise la marge qui existe entre l'hyperplan séparateur est les données ce qui revient en fait à résoudre un problème d'optimisation sous contrainte.
+Un classifieur SVM(support vector machines) est un algorithme d'apprentissage linéaire. Il permet de créer une frontière entre deux classes différentes tout comme un algorithme de régression logistique. L'avantage est qu'en plus de séparer l'espace binaire en deux espaces distincts, il maximise la marge qui existe entre l'hyperplan séparateur est les données ce qui revient en fait à résoudre un problème d'optimisation sous contrainte.
 
-Voici la visualisation de la séparatrice d'un svm pour des données binaires:\todo{mettre image svm avec marge maximisée}ici
+Voici la visualisation de la séparatrice d'un svm pour des données binaires:\\
+\begin{center}
+\includegraphics[scale=0.3]{svm}
+\end{center}
 \subsection{Formation d'un classifieur multi-classe}
 Notre problème de classification d'image n'est pas une classification binaire, en effet nous devons catégoriser nos images parmi 15 classes différentes et non deux. Pour ce faire nous allons créer 15 classifieurs binaires chacun correspondant à une classe versus toutes les autres. Pour classifier une image nous classifierons l'image avec les 15 classifieurs et choisirons la classe dont le score sera maximal.
 
@@ -57,11 +74,16 @@ Voici la visualisation de la matrice de confusion obtenu après la catégorisati
 
 Voici la visualisation de la matrice de confusion obtenu après la catégorisation de notre ensemble de test:\todo{mettre image matrice de confusion}ici
 \subsection{Carte de chaleur de classification}
-Afin d'analyser l'impact de chaque descripteur local lors de la classification d'image, nous avons mis en place une fonction permettant de calculer une "carte de chaleur de classification". Pour ce faire nous choisissons les descripteurs locaux ayant les plus fortes contributions. Nous avons donc calculé pour chaque descripteur local sa contribution lors de la classification à l'aide de la formule suivante:  $\frac{1}{N}  w_m^*$ \\\\
+Afin d'analyser l'impact de chaque descripteur local lors de la classification d'image, nous avons mis en place une fonction permettant de calculer une "carte de chaleur de classification".  Nous avons donc calculé pour chaque descripteur local sa contribution lors de la classification à l'aide de la formule suivante:  $\frac{1}{N}  w_m^*$ \\\\
 \textbf{Question: Montrer que la contribution de chaque descripteur $x_j$ dans la fonction de classification s'écrit $p(x_j) = \frac{1}{N}  w_m^*$} ?\\\\
 Ceci est plus une explication qu'une démonstration..\\
-N correspond au nombre de descripteurs locaux dans l'image et $m^*$ au mot visuel le plus proche de la classe k en question. Il suffit alors de regarder quel est le poids associé à ce mot visuel dans le modèle de classification de la classe k pour connaitre sa contribution. Etant donné qu'il s'agit d'une probabilité il faut divisé ce poids par le nombre de descripteurs locaux. Nous obtenons ainsi pour chaque descripteur local le mot visuel le plus discriminant pour la catégorisation avec une certaine probabilité. Ceci nous permet de faire cette visualisation qui représente pour chaque descripteur l'importance qu'il a dans la catégorisation. \\
-\todo{mettre image de la carte de chaleur}
+N correspond au nombre de descripteurs locaux dans l'image et $m^*$ au mot visuel le plus proche de la classe k en question. Il suffit alors de regarder quel est le poids associé à ce mot visuel dans le modèle de classification de la classe k pour connaitre sa contribution. Etant donné qu'il s'agit d'une probabilité il faut divisé ce poids par le nombre de descripteurs locaux. Nous obtenons ainsi pour chaque descripteur local un scalaire représentant son importance pour la catégorisation avec une certaine probabilité. Ceci nous permet de faire cette visualisation qui représente pour chaque descripteur, l'importance qu'il a dans la catégorisation. \\
+On remarque bien que les sifts se situant dans l'image entre la mer et le ciel ont un poids fort dans la classification de cette image grâce à la carte de chaleur de classification. (image en bas à gauche)\\
+
+\begin{center}
+\includegraphics[scale=0.3]{heatMap}
+\end{center}
+
 
 
 

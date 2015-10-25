@@ -12,7 +12,8 @@ object Weighter {
 
   class WeighterTF1(val index:Index.Index) extends Weighter {
     def getDocWeightsForDoc(idDoc:Int):Option[Seq[(String,Float)]]={
-      index.getTfsForDoc(idDoc) match {
+      val s =System.nanoTime
+      val r = index.getTfsForDoc(idDoc) match {
         case None=>None
         case Some(seq)=>{
           //val nbWords:Int = seq.map(a=>a._2).sum
@@ -20,6 +21,8 @@ object Weighter {
           Option(seq.map(a=>(a._1,a._2.toFloat)))
         }
       }
+      println("temps pour un getdocweightfordoc==== "+(System.nanoTime-s)/1e9+"s")
+      return r
     }
 
     def getDocWeightsForStem(stem:String):Option[Seq[(Int,Float)]]={

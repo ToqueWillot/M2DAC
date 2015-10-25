@@ -90,7 +90,7 @@ object Index {
             case 1 => None
             case _ => Option(tuple(1).split(";").map(_.toInt).toSeq)
           }
-          linksSucc.put(tuple(0).toInt,list)
+          linksPred.put(tuple(0).toInt,list)
         })
     }
     println("indeex linksPred ok")
@@ -192,6 +192,7 @@ object Index {
        //create the list that contains word (idDoc,tf)
        val listTmp:scala.collection.mutable.Map[String,scala.collection.mutable.ListBuffer[(Int,Int)]]=scala.collection.mutable.Map()
        println("ooook1")
+       var cpt=1
        docs.foreach{u=>{
          val line = readRAF2(u._2._1,u._2._2,index)
          val split=line.split(":")
@@ -207,6 +208,8 @@ object Index {
              }
            })
          }
+         print("line number "+cpt)
+         cpt+=1
        }
      }
 
@@ -219,9 +222,9 @@ object Index {
             val curF:Int=inverted.getFilePointer().toInt
             val line= word._1+":"+word._2.map(tup=>tup._1.toString+","+tup._2.toString).mkString(";")
             val sizeLine:Int = line.size
-            inverted.writeChars(line+"\n")
+            inverted.writeBytes(line+"\n")
             stems.put(word._1 ,(curF, sizeLine))
-            pw.write(word._1+":"+curF.toString+":"+sizeLine.toString)
+            pw.write(word._1+":"+curF.toString+":"+sizeLine.toString+"\n")
            }
        )
        println("ooook3")
@@ -241,7 +244,7 @@ object Index {
         val line:String = doc.getId()+":"+createStringFromMap(getMapWordOccurFromString(doc.getText()))
         val sizeLine:Int = line.size
 
-        index.writeChars(line+"\n")
+        index.writeBytes(line+"\n")
         docs.put(doc.getId().toInt ,(curF, sizeLine))
         doc = parser.nextDocument()
       }
@@ -300,18 +303,15 @@ object Index {
       }
 
       inverted.seek(0)
-      mapWordDoc.map(e=>{
+      val pw = new PrintWriter(new File(filenameStems))
+      mapWordDoc.foreach(e=>{
       val curF:Int=inverted.getFilePointer().toInt
       val line:String = e._1+":"+createStringFromMapIntInt(e._2.toMap)
       val sizeLine:Int = line.size
-      inverted.writeChars(line+"\n")
+      inverted.writeBytes(line+"\n")
       stems.put(e._1 ,(curF, sizeLine))
-      })
-      //write in file docs
-      val pw = new PrintWriter(new File(filenameStems))
-      stems.map(elem=>{
-        val txt:String=elem._1.toString+":"+elem._2._1.toString+":"+elem._2._2.toString+"\n"
-        pw.write(txt)
+      val txt:String=e._1.toString+":"+curF.toString+":"+sizeLine.toString+"\n"
+      pw.write(txt)
       })
       pw.close
     }
@@ -428,8 +428,14 @@ object Index {
        List.range(0,size).map(_=>file.readByte().asInstanceOf[Char]).toArray.mkString("")
      }
      def readRAF2(begin:Int,size:Int, file: RandomAccessFile):String={
+       val s=System.nanoTime
        file.seek(begin)
-       List.range(0,size).map(_=>file.readChar()).toArray.mkString("")
+       println("temsfile seek "+(System.nanoTime-s)/1e9+"s")
+       val s2=System.nanoTime
+       val r = file.readLine()
+       println("temsfile readline "+(System.nanoTime-s2)/1e9+"s")
+       r
+       //List.range(0,size).map(_=>file.readChar()).toArray.mkString("")
      }
 
     //TODO--------------
