@@ -21,7 +21,7 @@ object Weighter {
           Option(seq.map(a=>(a._1,a._2.toFloat)))
         }
       }
-      println("temps pour un getdocweightfordoc==== "+(System.nanoTime-s)/1e9+"s")
+      //println("temps pour un getdocweightfordoc==== "+(System.nanoTime-s)/1e9+"s")
       return r
     }
 

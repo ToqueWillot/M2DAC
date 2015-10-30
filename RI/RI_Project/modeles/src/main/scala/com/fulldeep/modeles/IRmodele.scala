@@ -5,7 +5,7 @@ import scala.util.Random
 
 object IRmodele {
 
-  abstract class IRmodele(){
+  abstract class IRmodele(val index:Index.Index,val weighter:Weighter.Weighter){
 
     def getScores(query: Map[String,Int],normalized:Boolean):Seq[(Int,Float)]
 
@@ -21,7 +21,7 @@ object IRmodele {
 
 
 
-  class Vectoriel(val index:Index.Index,val weighter:Weighter.Weighter) extends IRmodele {
+  class Vectoriel(val index:Index.Index,val weighter:Weighter.Weighter) extends IRmodele(index,weighter) {
 
     def getScores(query: Map[String,Int],normalized : Boolean = false):Seq[(Int,Float)]={
       var timeDocWeight=0.0f
@@ -46,41 +46,42 @@ object IRmodele {
           })
         }
       }
-      println("temps total getdocw "+(timetot)/1e9+"s")
+      //println("temps total getdocw "+(timetot)/1e9+"s")
       return res
     }
 
   }
 
-  // class LanguageModel(val index:Index.Index,val weighter:Weighter.Weighter) extends IRmodele {
-  //
-  //
-  //   def pmquery(query:Map[String,Int],doc:Map[String,Int]):Float={
-  //     val tailledoc=doc.map(_._2).sum
-  //     query.map(w=>{
-  //       Option(doc(w._1)) match {
-  //         case Some(n)=> n*math.log(n.toFloat/tailledoc).toFloat
-  //         case None=> 0.0f
-  //       }
-  //     }).sum
-  //   }
-  //
-  //
-  //
-  //   def getScores(query: Map[String,Int],normalized : Boolean = false):Seq[(Int,Float)]={
-  //     normalized match {
-  //       case false => {
-  //         val queryWeight: Seq[(String,Float)]= weighter.getWeightsForQuery(query)
-  //
-  //
-  //       }
-  //       case true =>{
-  //
-  //       }
-  //     }
-  //
-  //   }
-  //
-  // }
+  class LanguageModel(val index:Index.Index,val weighter:Weighter.Weighter,val lambda:Float) extends IRmodele(index,weighter) {
+
+    def getScores(query: Map[String,Int],normalized : Boolean = false):Seq[(Int,Float)]={
+        val mapp:scala.collection.mutable.Map[Int,Float]=scala.collection.mutable.Map()
+        val queryWeight: Seq[(String,Float)]= weighter.getWeightsForQuery(query)
+
+        queryWeight.foreach(w=> {
+          val weightWinCorpus=weighter.getDocWeightsForStem(w._1) match{
+            case None=>0.0f
+            case Some(l)=>l.map(_._2).sum
+          }
+
+          weighter.getDocWeightsForStem(w._1) match{
+            case None=>
+            case Some(s)=>{
+                index.docs.toSeq.foreach(doc=>{
+
+                var pdt= s.toMap.getOrElse(doc._1,0.0f)/weighter.getDocWeightsForDoc(doc._1).get.map(_._2).sum
+                if(!(mapp.contains(doc._1)) ){
+                  mapp.put(doc._1,0.0f)
+
+                }
+                mapp.put(doc._1,mapp(doc._1)+ queryWeight.toMap.getOrElse(w._1,0.0f) *math.log(lambda *pdt+(1-lambda)*weightWinCorpus))
+              })
+            }
+          }
+        })
+        mapp.toSeq
+    }
+  }
+
 
 }

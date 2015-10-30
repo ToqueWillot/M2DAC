@@ -40,6 +40,24 @@ object Index {
     val filenameLinksSucc:String="../indexation/src/resources/"+name+"_linksSucc.csv"
     val filenameLinksPred:String="../indexation/src/resources/"+name+"_linksPred.csv"
 
+    //
+    val docsTf:scala.collection.mutable.Map[Int,Seq[(String,Int)]]=scala.collection.mutable.Map()
+    if(new java.io.File(file_index_name).exists){
+        val file = scala.io.Source.fromFile(file_index_name, "UTF-8").getLines.toList.map(line=>{
+          val sp = line.split(":")
+          val tuple = (sp(0),createSeqFromString(sp(1)))
+          docsTf.put(tuple._1.toInt,tuple._2)
+        })
+    }
+
+    val stemsDocs:scala.collection.mutable.Map[String,Seq[(Int,Int)]]=scala.collection.mutable.Map()
+    if(new java.io.File(file_inverted_name).exists){
+        val file = scala.io.Source.fromFile(file_inverted_name, "UTF-8").getLines.toList.map(line=>{
+          val sp = line.split(":")
+          val tuple = (sp(0),createSeqIntIntFromString(sp(1)))
+          stemsDocs.put(tuple._1,tuple._2)
+        })
+    }
 
     //hashMap contains the positions
 
@@ -244,6 +262,11 @@ object Index {
         val line:String = doc.getId()+":"+createStringFromMap(getMapWordOccurFromString(doc.getText()))
         val sizeLine:Int = line.size
 
+
+        val sp = line.split(":")
+        val tuple = (sp(0),createSeqFromString(sp(1)))
+        docsTf.put(tuple._1.toInt,tuple._2)
+
         index.writeBytes(line+"\n")
         docs.put(doc.getId().toInt ,(curF, sizeLine))
         doc = parser.nextDocument()
@@ -308,6 +331,11 @@ object Index {
       val curF:Int=inverted.getFilePointer().toInt
       val line:String = e._1+":"+createStringFromMapIntInt(e._2.toMap)
       val sizeLine:Int = line.size
+
+      val sp = line.split(":")
+      val tuple = (sp(0),createSeqIntIntFromString(sp(1)))
+      stemsDocs.put(tuple._1,tuple._2)
+
       inverted.writeBytes(line+"\n")
       stems.put(e._1 ,(curF, sizeLine))
       val txt:String=e._1.toString+":"+curF.toString+":"+sizeLine.toString+"\n"
@@ -439,15 +467,27 @@ object Index {
      }
 
     //TODO--------------
-    def getTfsForDoc(doc:Int):Option[Seq[(String,Int)]]={
+    def getTfsForDoc2(doc:Int):Option[Seq[(String,Int)]]={
       docs.get(doc) match{
         case Some((begin,size))=> Option(createSeqFromString(readRAF2(begin,size,index).split(":")(1)))
         case None => None
       }
     }
-    def getTfsForStem(stem:String):Option[Seq[(Int,Int)]] = {
+    def getTfsForStem2(stem:String):Option[Seq[(Int,Int)]] = {
       stems.get(stem) match{
         case Some((begin,size))=> Option(createSeqIntIntFromString(readRAF2(begin,size,inverted).split(":")(1)))
+        case None => None
+      }
+    }
+    def getTfsForDoc(doc:Int):Option[Seq[(String,Int)]]={
+      docsTf.get(doc) match{
+        case Some(sequence)=> Option(sequence)
+        case None => None
+      }
+    }
+    def getTfsForStem(stem:String):Option[Seq[(Int,Int)]] = {
+      stemsDocs.get(stem) match{
+        case Some(sequence)=> Option(sequence)
         case None => None
       }
     }

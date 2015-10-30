@@ -34,9 +34,13 @@ import java.io.File
 			}
 
 
-			def nextQuery():Query = {
+			def nextQuery():Option[Query] = {
 				val doc:Document = parser.nextDocument()
-				docToQuery ( doc , mapQueryRel)
+				doc match{
+					case null=>None
+					case docc=>Option(docToQuery( docc , mapQueryRel))
+				}
+
 			}
 
 			def docToQuery(doc:Document,mapQueryRel:Map[Int,Seq[Int]]):Query={

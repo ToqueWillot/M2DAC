@@ -6,13 +6,36 @@ import scala.util.Random
 
 
 
-class EvalIRModele(){
+class EvalIRModele(val model:IRmodele.IRmodele, val measure:EvalMeasure,val queries: List[Query]){
 
-  def mean(irList:Seq[IRList],measureList:Seq[EvalMeasure]):Seq[Float]={
-    measureList.map(m=>irList.map(ir=>m.eval(ir).map(_._2).sum/m.eval(ir).toList.size).sum/irList.size )
+  var mean :Seq[Float]=Seq()
+  var std :Seq[Float]=Seq()
+  var evalValue:Float=0.0f
+
+  def eval():Unit={
+    var nuquery=1
+    val seqseqfloat = queries.map(query=>{
+      println("--------------------query numero ",nuquery)
+      nuquery+=1
+      val queryStems:Map[String,Int]=model.indexx.getMapWordOccurFromString(query.text)
+      val rank:Seq[(Int,Float)]=model.getRanking(queryStems)
+      val irList=new IRList(query,rank)
+      measure.eval(irList)
+    })
+
+    //mean
+    mean=seqseqfloat.transpose.map(e=> e.sum.toFloat/seqseqfloat.size)
+
+    //std
+    var idx = -1
+    std = seqseqfloat.transpose.map(e=>{
+      idx += 1
+      math.sqrt(e.map(v=>(v-mean(idx))*(v-mean(idx))).sum).toFloat
+    })
+
+    evalValue = mean.sum.toFloat/mean.size
+
   }
-  def standard_deviation(irList:Seq[IRList],measureList:Seq[EvalMeasure]):Seq[Float]={
-   val mean = measureList.map(m=> (m,(irList.map(ir=>m.eval(ir).map(_._2).sum/m.eval(ir).map(_._2).size).sum/irList.size)) ).toMap
-   measureList.map(m=>irList.map(ir=>math.abs(m.eval(ir).map(_._2).sum/m.eval(ir).toList.size - mean(m))).sum/irList.size )
- }
+
+
 }
