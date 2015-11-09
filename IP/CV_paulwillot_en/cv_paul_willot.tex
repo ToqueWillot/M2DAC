@@ -29,6 +29,8 @@
 \moderncvcolor{blue} % CV color - options include: 'blue' (default), 'orange', 'green', 'red', 'purple', 'grey' and 'black'
 
 \usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
+\usepackage{paracol}
+\usepackage{microtype}
 
 \usepackage[scale=0.80]{geometry} % Reduce document margins
 %\setlength{\hintscolumnwidth}{3cm} % Uncomment to change the width of the dates column
@@ -50,7 +52,7 @@
 %\title{Curriculum Vitae}
 %\title{I support vector machines}
 \title{~~}
-\address{2 quai du barrage}{94340, Joinville}
+\address{2 quai du barrage}{94340, Joinville, France}
 \mobile{+33 6 76 13 83 21}
 \email{paul.willot@etu.upmc.fr}
 \extrainfo{19/12/1995}
@@ -75,7 +77,7 @@
 
 \section{Education}
 
-\cventry{2014-2016}{Master Données, Apprentissage et Connaissance (Data Science and Machine Learning)}{Université Pierre et Marie Curie }{Paris VI}{program of academic excellence}{}
+\cventry{2014-2016}{Master Données, Apprentissage et Connaissances (Data Science and Machine Learning)}{Université Pierre et Marie Curie }{Paris VI}{program of academic excellence}{}
 %Master in Computer Science, excellence branch, in the specialty Données, Apprentissage et Connaissances (Data Science and Machine Learning)
 \cventry{2011--2014}{Bachelor in computer science}{Université Pierre et Marie Curie }{Paris VI}{mention international curriculum – Semester of second year in Montreal, Canada}{}
 %Bachelor in computer science, with mention ‘international curriculum’ – Semester of second year in Montreal, Canada
@@ -93,54 +95,37 @@
 
 %\subsection{Vocational}
 %mettre encadrant peut être...
-\cventry{June-September 2015}{Research in Natural Language Processing}{Tokyo}{National Institute of Informatics}{}{
-\textsc{Extracting Structure from Scientific Abstracts using Neural Networks}\\
-\textit{Published by Springler, presented at ICADL 2015, Seoul.}}
-%\newline{}
-%\newline{}
-%Detailed achievements:
-%\begin{itemize}
-%\item Développement en Scala et python. Utilisation de modèle Word2Vec.
-%\item another thing
-%\item Managing complex system from previous intern
-%\end{itemize}
+\cventry{Summer 2015}{\textsc{Extracting Structure from Scientific Abstracts using Neural Networks}}{}{}{}{
+%\textsc{Extracting Structure from Scientific Abstracts using Neural Networks}\\
+Paul Willot, Kazuhiro Hattori, and Akiko Aizawa\\
+\textit{Published by Springer, presented at the ICADL 2015, Seoul.}}
+%\textit{Published by Springer, presented at the International Conference on Asian Digital Libraries 2015, Seoul.}}
+
 
 %------------------------------------------------
 
 %\cventry{2010--2011}{Summer Intern}{\textsc{Lehman Brothers}}{Los Angeles}{}{Rated "truly distinctive" for Analytical Skills and Teamwork.}
 
-%------------------------------------------------
-
-
-%rangement, équipement, entretien des livres, accueil des lecteurs et formation d'agents}
-
-%\cventry{2012--2016}{Science private lessons}{House}{my Neighborhood}{}{Talked with ADHD-)}
-
-%----------------------------------------------------------------------------------------
-%	AWARDS SECTION
-%----------------------------------------------------------------------------------------
-
-%\section{Awards}
-
-%\cvitem{2011}{School of Business Postgraduate Scholarship}
-%\cvitem{2010}{Top Achiever Award -- Commerce}
-
 
 \section{Projects}
 %\cventry{2015}{Time series analysis}{}{}{}{Anomaly detection on smart cards data from the Parisian subway network (STIF): study about the impact of social events on metro traffic.}
-\cventry{2015}{Time series analysis}{}{Paris}{}{Anomaly detection on smart cards data from the Parisian subway network (STIF): study about the impact of social events on metro traffic.}
-\cventry{2015}{Text analysis on both French and English}{}{Paris}{}{Keyword, named entity and theme extraction, using unsupervised learning.}
-\cventry{2014}{Robotic challenge}{}{Paris}{}{Design and building of a drone, challenge winner.}
+\cventry{June-Sept 2015}{Research in Natural Language Processing}{Tokyo}{National Institute of Informatics}{}{
+Research internship supervised by professor Akiko Aizawa, researching on natural language processing using state of the art deep learning algorithms.}
+\cventry{March-May 2015}{Time series analysis}{}{Master project}{}{Anomaly detection on smart cards data from the Parisian subway network (STIF)}
+%: study about the impact of social events on metro traffic.}
+\cventry{Jan-March 2015}{Text analysis on both French and English}{}{Master project}{}{Keyword, named entity and theme extraction, using unsupervised learning.}
+\cventry{2014}{Robotic challenge}{}{University competition}{}{Design and building of a drone, challenge winner.}
 
 %----------------------------------------------------------------------------------------
 %	COMPUTER SKILLS SECTION
 %----------------------------------------------------------------------------------------
 
 \section{Skills}
-\cvitem{OS}{Linux, Mac, Windows}
+
 \cvitem{BI / DB}{\textsc{SQL, XQuery, SPARQL, OLAP/MDX, ETL} (Pentaho)}
-\cvitem{Sufficient}{\textsc{C}, \textsc{Ada}, \textsc{Java}, \textsc{OCaml}, \textsc{Matlab}, \textsc{\LaTeX}}
-\cvitem{Advanced}{\textsc{Python} (pandas/theano/gensim), \textsc{Lua} (torch), \textsc{Scala} (Spark)}
+\cvitem{General}{\textsc{C}, \textsc{Ada}, \textsc{Java}, \textsc{OCaml}, \textsc{Matlab}, \textsc{\LaTeX}}
+\cvitem{ML}{\textsc{Python} (keras/pandas/theano/gensim), \textsc{Lua} (torch), \textsc{Scala} (Spark)}
+\cvitem{OS}{Linux, Mac, Windows}
 %C, Python, Java, Ada, OCaml, HTML, SQL,
 
 %----------------------------------------------------------------------------------------
@@ -162,14 +147,34 @@
 %scolaire
 %notions
 
-\section{Language}
+\section{Languages and Interests}
 
 \renewcommand{\listitemsymbol}{} % Changes the symbol used for lists
-%\cvlistdoubleitem{French \textbf{~~Native}}{English \textbf{~~~Proficient}}
-%\cvlistdoubleitem{German \textbf{~Survivable}}{Japanese \textbf{~Basic}}
-\cvlistdoubleitem{\textbf{French} ~~Native}{\textbf{English} ~~~Proficient}
+\cvlistdoubleitem{\textbf{French} ~~Native}{\textbf{English} ~~~Fluent}
 \cvlistdoubleitem{\textbf{German} ~Survivable}{\textbf{Japanese} ~Basic}
-%\cvitemwithcomment{Spanish}{Basic}{Basic words and phrases only}
+\hfill\\
+\cvitem{}{\textbf{Interests:} Deep Learning, Kaggle, Meetups, Rock climbing, Piano}
+%\cvlistitem{\textbf{German} ~Survivable}{\textbf{German} ~Survivable}{\textbf{German} ~Survivable}{\textbf{German} ~Survivable}
+%\cvitem{}{
+%\begin{paracol}{4}\sloppy
+%    \switchcolumn[0]\noindent
+%    \textbf{Column 1 text:}
+%    Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+%
+%\switchcolumn[1]\noindent
+%    \textbf{Column 2 text:}
+%    Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+%
+%\switchcolumn[2]\noindent
+%    \textbf{Column 3 text:}
+%    Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+%
+%\switchcolumn[3]\noindent
+%    \textbf{Column 4 text:}
+%    Integer iaculis nibh at orci hendrerit et elementum enim luctus. 
+%\end{paracol}
+
+%}
 
 %----------------------------------------------------------------------------------------
 %	INTERESTS SECTION
@@ -177,51 +182,16 @@
 
 %\section{Divers}
 %\cvlistitem{Permis obtenu en 2012}
-\section{Interests}
+%\section{Interests}
 
-\renewcommand{\listitemsymbol}{~} % Changes the symbol used for lists
+%\renewcommand{\listitemsymbol}{~} % Changes the symbol used for lists
 
 %\cvitem{Meetup}{Machine Learning, Deep Learning}
 %\cvitem{Sports}{Rock climbing, Skiing, Hiking, Hacking}
 %\cvitem{Musique}{Piano}
 
-\cvlistitem{Deep Learning, Kaggle, Meetups}
-\cvlistitem{Sports: Rock climbing, Skiing, Hiking, Hacking~~~~~~Music: Piano}
+%\cvitem{}{Deep Learning, Kaggle, Meetups, Rock climbing, Piano}
+%\cvlistitem{Sports: Rock climbing, Skiing, Hiking, Hacking~~~~~~Music: Piano}
 
-
-%\cvlistdoubleitem{Traveling}{Reading}
-%\cvlistdoubleitem{Cooking}{Running}
-%\cvlistitem{Running}
-
-
-
-%\cventry{year--year}{Degree}{Institution}{City}{\textit{Grade}}{Description}
-%\cvlanguage{Language 1}{Skill level}{Comment}
-%\cvcomputer{category 1}{XXX, YYY, ZZZ}{category 4}{XXX, YYY, ZZZ}
-%\cvline{hobby 1}{\small Description}
-
-
-
-%----------------------------------------------------------------------------------------
-%	COVER LETTER
-%----------------------------------------------------------------------------------------
-
-% To remove the cover letter, comment out this entire block
-
-%\clearpage
-
-%\recipient{HR Department}{Corporation\\123 Pleasant Lane\\12345 City, State} % Letter recipient
-%\date{\today} % Letter date
-%\opening{Dear Sir or Madam,} % Opening greeting
-%\closing{Sincerely yours,} % Closing phrase
-%\enclosure[Attached]{curriculum vit\ae{}} % List of enclosed documents
-
-%\makelettertitle % Print letter title
-
-%\lipsum[1-3] % Dummy text
-
-%\makeletterclosing % Print letter signature
-
-%----------------------------------------------------------------------------------------
 
 \end{document}
