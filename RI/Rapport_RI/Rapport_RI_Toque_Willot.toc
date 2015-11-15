@@ -1,0 +1,19 @@
+\select@language {french}
+\contentsline {chapter}{Introduction}{3}
+\contentsline {section}{1.Indexation}{3}
+\contentsline {subsection}{1.Collections de documents}{3}
+\contentsline {subsection}{2.Transformation des textes}{3}
+\contentsline {subsection}{3.L'indexation}{3}
+\contentsline {section}{2.Mod\IeC {\`e}le vectoriel}{4}
+\contentsline {section}{3.Evaluation des r\IeC {\'e}sultats}{4}
+\contentsline {subsection}{1.La mesure Pr\IeC {\'e}cision-Rappel}{4}
+\contentsline {subsection}{2.La mesure de pr\IeC {\'e}cision Moyenne}{4}
+\contentsline {section}{4.Mod\IeC {\`e}les probabilistes}{4}
+\contentsline {subsection}{1.Mod\IeC {\`e}le de langue}{5}
+\contentsline {subsection}{2.Mod\IeC {\`e}le BM25 - OKAPI}{5}
+\contentsline {section}{5.Marche al\IeC {\'e}atoires sur les graphes}{5}
+\contentsline {subsection}{1.Page Rank}{5}
+\contentsline {subsection}{2.HITS}{5}
+\contentsline {section}{6.Combinaison des scores}{5}
+\contentsline {section}{7.Comparaison des scores entre diff\IeC {\'e}rentes mesures}{5}
+\contentsline {chapter}{Conclusion}{6}

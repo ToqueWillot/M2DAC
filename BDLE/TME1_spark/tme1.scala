@@ -71,3 +71,6 @@ val e = noteSplit.map(n=>n(1)->1).reduceByKey(_+_).takeOrdered(10)(Ordering[Int]
 
 
 val f = utilsSplit.map(_(0)).subtract(noteSplit.map(_(0)))
+
+
+//join, reduceByKey, union, distinct, substract

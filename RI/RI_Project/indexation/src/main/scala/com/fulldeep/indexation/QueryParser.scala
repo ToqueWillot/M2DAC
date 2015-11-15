@@ -15,7 +15,7 @@ import java.io.File
 	  class QueryParser(val fileQuery:String, val fileRel:String) extends Serializable {
 			val parser = new ParserCISI_CACM()
 			parser.init(fileQuery)
-
+			
 			val mapQueryRel: Map[Int,Seq[Int]]= getMapQueryRel(fileRel)
 
 			def getMapQueryRel(fileRel:String):Map[Int,Seq[Int]]={
@@ -27,7 +27,7 @@ import java.io.File
 				// rdd.groupByKey().collect()
 
 				scala.io.Source.fromFile(fileRel, "UTF-8").getLines.toList.map(line=>{
-					val split = line.split(" ")
+					val split = line.split(" ").filter(_.size!=0)
 					(split(0).toInt,split(1))
 				}).groupBy(_._1).map(e=>(e._1,e._2.map(z=>z._2.toInt).toSeq)).toMap
 

@@ -17,7 +17,7 @@ class EvalIRModele(val model:IRmodele.IRmodele, val measure:EvalMeasure,val quer
     val seqseqfloat = queries.map(query=>{
       println("--------------------query numero ",nuquery)
       nuquery+=1
-      val queryStems:Map[String,Int]=model.indexx.getMapWordOccurFromString(query.text)
+      val queryStems:Map[String,Int]=model.index.getMapWordOccurFromString(query.text)
       val rank:Seq[(Int,Float)]=model.getRanking(queryStems)
       val irList=new IRList(query,rank)
       measure.eval(irList)

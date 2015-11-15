@@ -127,12 +127,13 @@ val d = parserr.nextDocument()
 import com.fulldeep.indexation._
 import java.io.FileInputStream
 val filename :String = "../../data/cacm/cacm.txt"
-//val filename :String = "../cacmTaille2Test.txt"
+//val filename :String = "../../data/cisi/cisi.txt"
 
 val parser = new ParserCISI_CACM()
 val stemmer = new Stemmer()
 
 val indexer = new Index.Index("cacm",parser,stemmer)
+//val indexer = new Index.Index("cisi",parser,stemmer)
 // indexer.indexation_index(filename)
 // indexer.indexation_inverted2(filename)
 indexer.indexation(filename)
@@ -163,16 +164,104 @@ indexer.getTfsForStem("techniqu")
 
 /* ----- Test TME3 ---- */
 import com.fulldeep.evaluation._
+
+
+
+val categorizer = new IRmodele.Vectoriel(indexer,weighter)
+
+// test du query parser
+// val fileQuery:String="../../data/cisi/cisi.qry"
+// val fileRel:String="../../data/cisi/cisi.rel"
+// val qp=new QueryParser(fileQuery,fileRel)
+
 val fileQuery:String="../../data/cacm/cacm.qry"
 val fileRel:String="../../data/cacm/cacm.rel"
 val qp=new QueryParser(fileQuery,fileRel)
 
+val queries:scala.collection.mutable.ListBuffer[Query]=scala.collection.mutable.ListBuffer()
+var q = qp.nextQuery()
+while (q!=None){
+  queries+=q.get
+  q = qp.nextQuery()
+}
 
-val categorizer = new IRmodele.Vectoriel(indexer,weighter)
+
+val queriesList=queries.toList
+//val measure: EvalMeasure= new Precision_Recall()
+val measure: EvalMeasure= new Precision_Mean()
+val evalIrmodele=new EvalIRModele(categorizer,measure,queriesList)
+evalIrmodele.eval()
+println(evalIrmodele.mean)
+
+
+/* ----- Test TME4 ---- */
+import com.fulldeep.evaluation._
+
+//val categorizer = new IRmodele.LanguageModel(indexer,weighter,lambda=0.8f)
+val categorizer = new IRmodele.OKAPI(indexer,weighter, k= 1.5f, b= 0.75f)
 categorizer.getRanking(mapquery)
 
+// test du query parser
+// val fileQuery:String="../../data/cisi/cisi.qry"
+// val fileRel:String="../../data/cisi/cisi.rel"
+// val qp=new QueryParser(fileQuery,fileRel)
+
+val fileQuery:String="../../data/cacm/cacm.qry"
+val fileRel:String="../../data/cacm/cacm.rel"
+val qp=new QueryParser(fileQuery,fileRel)
+
+val queries:scala.collection.mutable.ListBuffer[Query]=scala.collection.mutable.ListBuffer()
+var q = qp.nextQuery()
+while (q!=None){
+  queries+=q.get
+  q = qp.nextQuery()
+}
+
+
+val queriesList=queries.toList
+//val measure: EvalMeasure= new Precision_Recall()
+val measure: EvalMeasure= new Precision_Mean()
+val evalIrmodele=new EvalIRModele(categorizer,measure,queriesList)
+evalIrmodele.eval()
+println(evalIrmodele.mean)
+
+/* ----- Test TME5 ---- */
+import com.fulldeep.evaluation._
+
+//indexation
+import com.fulldeep.indexation._
+import java.io.FileInputStream
+val filename :String = "../../data/cacm/cacm.txt"
+val parser = new ParserCISI_CACM()
+val stemmer = new Stemmer()
+val indexer = new Index.Index("cacm",parser,stemmer)
+indexer.indexation(filename)
+//weighter et query
+import com.fulldeep.modeles._
+val weighter = new Weighter.WeighterTF1(indexer)
+val query=" What articles exist which deal with TSS (Time Sharing System), an operating system for IBM computers?"
+val mapquery :Map[String,Int]= indexer.getMapWordOccurFromString(query)
+weighter.getWeightsForQuery(mapquery)
+indexer.getTfsForStem("techniqu")
+
+
+//variables pour le randomWalk
+val modelInit = new IRmodele.Vectoriel(indexer,weighter)
+val walkMoon = new pageRank(0.8f,100)
+val pred = indexer.linksPred.filter(x=>x._2!=None).map(e=>e._1->e._2.get).toMap
+val succ = indexer.linksSucc.filter(x=>x._2!=None).map(e=>e._1->e._2.get).toMap
+val nSeed = 30
+val nIn = 10
+
+val categorizer = new IRmodele.IRRandomWalk(indexer, weighter, modelInit, walkMoon,  succ, pred,  nSeed, nIn)
+
+categorizer.getRanking(mapquery)
 
 // test du query parser
+// val fileQuery:String="../../data/cisi/cisi.qry"
+// val fileRel:String="../../data/cisi/cisi.rel"
+// val qp=new QueryParser(fileQuery,fileRel)
+
 val fileQuery:String="../../data/cacm/cacm.qry"
 val fileRel:String="../../data/cacm/cacm.rel"
 val qp=new QueryParser(fileQuery,fileRel)

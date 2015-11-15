@@ -3,74 +3,95 @@ package com.fulldeep.modeles;
 import com.fulldeep.indexation._
 import scala.util.Random
 
-//
-// abstract class RandomWalk(val index:Index.Index){
-//   val succ:Map[(Int,Seq[Int])]=index.links
-//
-//   def getScores(query: Map[String,Int],normalized:Boolean):Map[Int,Float]
-//
-//   def getRanking(query: Map[String,Int]):Seq[(Int,Float)]={
-//       val scores:Seq[(Int,Float)] = getScores(query,false)
-//       Random.shuffle(scores).sortBy{-_._2}
-//   }
-// }
-//
-//
-//
-//
-// class Vectoriel(val index:Index.Index,val weighter:Weighter.Weighter) extends IRmodele {
-//
-//   def getScores(query: Map[String,Int],normalized : Boolean = false):Seq[(Int,Float)]={
-//     normalized match {
-//       case false => {
-//         val queryWeight: Seq[(String,Float)]= weighter.getWeightsForQuery(query)
-//         index.docs.map(doc=> {
-//           val mapDocWeights = weighter.getDocWeightsForDoc(doc._1).get.toMap
-//           (doc._1,queryWeight.map(word=>word._2 * mapDocWeights.getOrElse(word._1,0.0f)).sum)
-//         })
-//       }
-//       case true =>{
-//         val queryWeight: Seq[(String,Float)]= weighter.getWeightsForQuery(query)
-//         val normQuery :Float= math.sqrt(queryWeight.map(word => word._2*word._2).sum).toFloat
-//         index.docs.map(doc=> {
-//           val mapDocWeights = weighter.getDocWeightsForDoc(doc._1).get.toMap
-//           val normDoc :Float= math.sqrt(mapDocWeights.map(word => word._2*word._2).sum).toFloat
-//           (doc._1,queryWeight.map(word=>(word._2*mapDocWeights.getOrElse(word._1,0.0f))).sum/(normDoc*normQuery)  )
-//         }).toMap
-//       }
-//     }
-//
-//   }
-//
-// }
-//
-// class LanguageModel(val index:Index.Index,val weighter:Weighter.Weighter) extends IRmodele {
-//
-//
-//   def pmquery(query:Map[String,Int],doc:Map[String,Int]):Float={
-//     val tailledoc=doc.map(_._2).sum
-//     query.map(w=>{
-//       doc(w) match {
-//         case n=> n*math.log(n.toFloat/tailledoc)
-//         case None=> 0.0f
-//       }
-//     }).sum
-//   }
-//
-//
-//
-//   def getScores(query: Map[String,Int],normalized : Boolean = false):Seq[(Int,Float)]={
-//     normalized match {
-//       case false => {
-//         val queryWeight: Seq[(String,Float)]= weighter.getWeightsForQuery(query)
-//
-//
-//       }
-//       case true =>{
-//
-//       }
-//     }
-//
-//   }
-//
-// }
+
+abstract class RandomWalk(){
+  def walk(succ:Map[Int,Seq[Int]],pred:Map[Int,Seq[Int]]):Map[Int,Float]
+
+}
+class pageRank(val d:Float, val it:Int=100) extends RandomWalk {
+
+
+  def walk(succ:Map[Int,Seq[Int]],pred:Map[Int,Seq[Int]]):Map[Int,Float]={
+    val nbNode:Int=pred.size
+    var newMu = scala.collection.mutable.HashMap.empty[Int,Float]
+    var mu = scala.collection.mutable.HashMap.empty[Int,Float]
+
+    pred.foreach(id=>{
+      mu+=((id._1,1.0f/nbNode))
+      newMu+=((id._1,1.0f))
+    })
+
+    for( a <- 1 to it){
+      val tmp = (1.0f - d)/nbNode
+      pred.foreach(i=>{
+        var sum = 0.0f
+        pred(i._1).foreach(j=>{
+          sum += mu(i._1) / succ(j).size
+        })
+        sum*=d
+        newMu+=((i._1, tmp + sum))
+      })
+        val tmpMu = mu;
+  			mu = newMu;
+  			newMu = tmpMu;
+    }
+    mu.toMap
+  }
+
+
+}
+
+class HITS(val d:Float, val it:Int=100) extends RandomWalk {
+
+  val auth = scala.collection.mutable.HashMap.empty[Int,Float]
+  val hubs = scala.collection.mutable.HashMap.empty[Int,Float]
+
+  def walk(succ:Map[Int,Seq[Int]],pred:Map[Int,Seq[Int]]):Map[Int,Float]={
+
+    val nbNode = pred.size
+		val newAuth = scala.collection.mutable.HashMap.empty[Int,Float]
+  	val newHubs = scala.collection.mutable.HashMap.empty[Int,Float]
+		var normAuth:Float=0.0f
+		var normHubs:Float=0.0f
+
+		for( a <- 1 to nbNode){
+			val tmp = math.sqrt(1.0f/nbNode).toFloat
+      pred.foreach(key=>{
+        auth+=((key._1,tmp))
+        hubs+=((key._1,tmp))
+        newAuth+=((key._1,1.0f))
+        newHubs+=((key._1,1.0f))
+      })
+		}
+
+	   for( a <- 1 to it){
+			normHubs = 0.0f
+			normAuth = 0.0f
+      //loop pred
+      pred.foreach(ni=>{
+        var sum:Float=0.0f
+        //loop pred ni
+        pred(ni._1).foreach(nj=>{
+          sum+=hubs.getOrElse(nj,0.0f)
+        })
+        newHubs+=((ni._1,sum))
+        normHubs+= sum*sum
+        sum=0
+        //loop succ ni
+        succ(ni._1).foreach(nj=>{
+          sum+=auth.getOrElse(nj,0.0f)
+        })
+        newAuth+=((ni._1,sum))
+        normAuth+=sum*sum
+      })
+      normAuth=math.sqrt(normAuth).toFloat
+      normHubs=math.sqrt(normHubs).toFloat
+      pred.foreach(ni=>{
+        auth+=((ni._1, newAuth(ni._1)/normAuth))
+        hubs+=((ni._1,newHubs(ni._1)/normHubs))
+      })
+    }
+    auth.toMap
+  }
+
+}

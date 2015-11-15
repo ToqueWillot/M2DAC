@@ -5,7 +5,7 @@ import scala.util.Random
 
 object IRmodele {
 
-  abstract class IRmodele(val index:Index.Index,val weighter:Weighter.Weighter){
+  abstract class IRmodele(var index:Index.Index,var weighter:Weighter.Weighter){
 
     def getScores(query: Map[String,Int],normalized:Boolean):Seq[(Int,Float)]
 
@@ -21,7 +21,7 @@ object IRmodele {
 
 
 
-  class Vectoriel(val index:Index.Index,val weighter:Weighter.Weighter) extends IRmodele(index,weighter) {
+  class Vectoriel(index:Index.Index,weighter:Weighter.Weighter) extends IRmodele(index,weighter) {
 
     def getScores(query: Map[String,Int],normalized : Boolean = false):Seq[(Int,Float)]={
       var timeDocWeight=0.0f
@@ -52,7 +52,7 @@ object IRmodele {
 
   }
 
-  class LanguageModel(val index:Index.Index,val weighter:Weighter.Weighter,val lambda:Float) extends IRmodele(index,weighter) {
+  class LanguageModel(index:Index.Index,weighter:Weighter.Weighter,val lambda:Float) extends IRmodele(index,weighter) {
 
     def getScores(query: Map[String,Int],normalized : Boolean = false):Seq[(Int,Float)]={
         val mapp:scala.collection.mutable.Map[Int,Float]=scala.collection.mutable.Map()
@@ -74,7 +74,7 @@ object IRmodele {
                   mapp.put(doc._1,0.0f)
 
                 }
-                mapp.put(doc._1,mapp(doc._1)+ queryWeight.toMap.getOrElse(w._1,0.0f) *math.log(lambda *pdt+(1-lambda)*weightWinCorpus))
+                mapp.put(doc._1,mapp(doc._1)+ queryWeight.toMap.getOrElse(w._1,0.0f) *math.log(lambda *pdt+(1-lambda)*weightWinCorpus).toFloat)
               })
             }
           }
@@ -82,6 +82,93 @@ object IRmodele {
         mapp.toSeq
     }
   }
+
+  class OKAPI(index:Index.Index,weighter:Weighter.Weighter,val k:Float, val b :Float) extends IRmodele(index,weighter) {
+    //nombre de documents dans le corpus
+    val nbDoc:Int=index.docsTf.size
+    //longueur moyenne dun document
+    val lMoyDoc:Int=index.docsTf.map(id=> id._2.map(t=>t._2).sum).sum/nbDoc
+
+    def getScores(query: Map[String,Int],normalized : Boolean = false):Seq[(Int,Float)]={
+        val mapScores = scala.collection.mutable.HashMap.empty[Int,Float]
+        var idf:Float=0;
+        var idft:Float=0;
+        var tf:Float=0;
+
+        query.foreach(stem=>{
+          val docsOfStem:Option[Seq[(Int,Float)]] = weighter.getDocWeightsForStem(stem._1)
+          docsOfStem match {
+            case None =>
+            case Some(s)=> s.foreach(doc=>{
+              idf=doc._2
+              tf=weighter.getDocWeightsForDoc(doc._1).get.toMap.get(stem._1).get
+              idft=math.max(0.0f, math.log((nbDoc - idf+0.5f)/(idf +0.5f)).toFloat)
+              if (!mapScores.contains(doc._1)){
+                mapScores+=((doc._1,0.0f))
+              }
+              mapScores(doc._1)+= idft * ((k+1)*tf)/(k*((1-b)+ b*index.docsTf(doc._1).map(_._2).sum /lMoyDoc)+tf)
+            })
+          }
+
+       })
+       mapScores.toSeq
+  }
+ }
+
+ class IRRandomWalk(index:Index.Index,weighter:Weighter.Weighter, modelInit:IRmodele, walkMoon: RandomWalk,
+			pred: Map[Int,Seq[Int]], succ: Map[Int,Seq[Int]],  nSeed:Int, nIn:Int) extends IRmodele(index,weighter) {
+
+      def getScores(query: Map[String,Int],normalized : Boolean = false):Seq[(Int,Float)]={
+
+        val seeds=scala.collection.mutable.HashSet.empty[Int]
+        val rankingInit:Seq[(Int,Float)]=modelInit.getRanking(query)
+        val rankingIterator = rankingInit.map(_._1).toIterator
+        var i = 0
+
+        while (i<nSeed && rankingIterator.hasNext){
+          val doc = rankingIterator.next
+          seeds+=doc
+          if(succ.contains(doc))
+            succ(doc).foreach(elem=> seeds+=elem)
+
+          if(pred.contains(doc)){
+            val predecesseurs=scala.collection.mutable.HashSet.empty[Int]
+            pred(doc).foreach(d=> predecesseurs += d )
+            var k = 0
+            while ( !(predecesseurs.isEmpty) && k<nIn ){
+         				val ind: Int = math.floor(math.random * predecesseurs.size).toInt
+                seeds+=predecesseurs.toList(ind)
+                predecesseurs.remove(ind)
+                k+=1
+         		}
+        	}
+         	i+=1
+        }
+
+        val sousSucc = scala.collection.mutable.HashMap.empty[Int,scala.collection.mutable.HashSet[Int]]
+        val sousPred = scala.collection.mutable.HashMap.empty[Int,scala.collection.mutable.HashSet[Int]]
+        seeds.foreach(doc=>{
+          sousSucc+=((doc,scala.collection.mutable.HashSet.empty[Int]))
+          if(!sousPred.contains(doc)){
+            sousPred+=((doc,scala.collection.mutable.HashSet.empty[Int]))
+          }
+          if(succ.contains(doc)){
+            succ(doc).foreach(s=>{
+              if(seeds.contains(s)){
+                sousSucc(doc)+=s
+                if(! sousPred.contains(s)){
+                  sousPred+=((s,scala.collection.mutable.HashSet.empty[Int]))
+                }
+              sousPred(s)+=doc
+              }
+            })
+          }
+        })
+
+        walkMoon.walk(sousPred.map(e=>e._1->e._2.toSeq).toMap, sousSucc.map(e=>e._1->e._2.toSeq).toMap).toSeq
+      }
+
+ }
 
 
 }
