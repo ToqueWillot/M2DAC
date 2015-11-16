@@ -280,3 +280,84 @@ val measure: EvalMeasure= new Precision_Mean()
 val evalIrmodele=new EvalIRModele(categorizer,measure,queriesList)
 evalIrmodele.eval()
 println(evalIrmodele.mean)
+
+
+// optimisation des parametres: K ------------------------------OKAPI
+import scala.util.Random
+val klist= (10 to 20 by 1 ).map(_.toFloat/10).toList
+//val klist=List(1.0f)
+val query_shuffle=Random.shuffle(queriesList)
+val query_train=query_shuffle.slice(0,40)
+val query_test=query_shuffle.slice(40,70)
+
+
+val resList:List[(Float,Float)] = klist.map(k=>{
+  val categorizer = new IRmodele.OKAPI(indexer,weighter, k, b= 0.75f)
+  val evalIrmodele=new EvalIRModele(categorizer,measure,query_train)
+  evalIrmodele.eval()
+  val res:Float = evalIrmodele.mean(0)
+  (k,res)
+})
+
+//score sur la partie test
+val klist2= List(2.0f)
+val resList2:List[(Float,Float)] = klist2.map(k=>{
+  val categorizer = new IRmodele.OKAPI(indexer,weighter, k, b= 0.75f)
+  val evalIrmodele=new EvalIRModele(categorizer,measure,query_test)
+  evalIrmodele.eval()
+  val res:Float = evalIrmodele.mean(0)
+  (k,res)
+})
+
+//ecrire dans le fichier
+import java.io.File
+import java.io.PrintWriter
+import scala.io.Source
+
+val writer = new PrintWriter(new File ("../okapiOpti.csv"))
+resList.foreach(tuple=>{
+  val s:String=tuple._1.toString+","+tuple._2.toString+";"
+  writer.write(s)
+})
+writer.close()
+
+
+// optimisation des parametres: lambda ------------------------------languageModel
+import scala.util.Random
+val klist= (0 to 10 by 1 ).map(_.toFloat/10).toList
+//val klist=List(1.0f)
+val query_shuffle=Random.shuffle(queriesList)
+val query_train=query_shuffle.slice(0,40)
+val query_test=query_shuffle.slice(40,70)
+
+
+val resList:List[(Float,Float)] = klist.map(k=>{
+  val categorizer = new IRmodele.LanguageModel(indexer,weighter,lambda= k)
+  val evalIrmodele=new EvalIRModele(categorizer,measure,query_train)
+  evalIrmodele.eval()
+  val res:Float = evalIrmodele.mean(0)
+  (k,res)
+
+})
+
+//score sur la partie test
+val klist2= List(2.0f)
+val resList2:List[(Float,Float)] = klist2.map(k=>{
+  val categorizer = new IRmodele.LanguageModel(indexer,weighter,lambda= k)
+  val evalIrmodele=new EvalIRModele(categorizer,measure,query_test)
+  evalIrmodele.eval()
+  val res:Float = evalIrmodele.mean(0)
+  (k,res)
+})
+
+//écrire dans le fichier
+import java.io.File
+import java.io.PrintWriter
+import scala.io.Source
+
+val writer = new PrintWriter(new File ("../lmOpti.csv"))
+resList.foreach(tuple=>{
+  val s:String=tuple._1.toString+","+tuple._2.toString+";"
+  writer.write(s)
+})
+writer.close()
