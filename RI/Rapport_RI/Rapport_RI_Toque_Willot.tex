@@ -70,29 +70,29 @@ Moteur de recherche --- Page Rank --- Hits --- Modèle vectoriel --- Indexation\
 
 \chapter*{{\centering Introduction}}
 \addcontentsline{toc}{chapter}{Introduction}
-Les moteurs de recherche servent à retrouver de l'information parmi un ensemble de documents. Pour chaque requête posée, leur action est de retourner les documents les plus pertinents. Le temps de réponse est aussi important pour juger si un moteur de recherche est performant ou non. Nous avons créer au cours des 6 TME (travaux machine encadrés de 2 heures) de l'UE RI un moteur de recherche. Les différentes parties de ce rapport vont porter sur chacun des TMEs. Nous allons donc expliquer ce qu'est l'indexation de documents, le modèle vectoriel qui est un algorithme de recherche d'information. Par la suite nous évoquerons comment nos modèles sont évalués ainsi que d'autres modèles qui sont probabilistes. Puis nous parlerons de l'algorithme du Page Rank qui a fait la notoriété de Google et plus généralement des algorithmes de marche aléatoire.  Enfin nous expliquerons différentes méthodes de combinaisons de scores qui permettent de tirer profit de différents modèles.
+Les moteurs de recherche servent à retrouver de l'information parmi un ensemble de documents. Pour chaque requête posée, leur action est de retourner les documents les plus pertinents. Le temps de réponse est aussi important pour juger si un moteur de recherche est performant ou non. Nous avons créer au cours des 6 TME (travaux machine encadrés de 2 heures) de l'UE RI un moteur de recherche. Les différentes parties de ce rapport vont porter sur chacun des TMEs. Nous allons donc expliquer ce qu'est l'indexation de documents, le modèle vectoriel qui est un algorithme de recherche d'information. Par la suite nous évoquerons comment nos modèles sont évalués ainsi que d'autres modèles qui sont probabilistes. Puis nous parlerons de l'algorithme du Page Rank qui a fait la notoriété de Google et plus généralement des algorithme de marche aléatoire.  Enfin nous expliquerons différentes méthodes de combinaisons de scores qui permettent de tirer profit de différents modèles.
 A noter que pour chaque modèle nous nous intéresserons à l'optimisation des paramètres, qui permet aux algorithmes d'obtenir de meilleures performances quant à leurs évaluations.
 
 
 
 \section*{1.Indexation}
 \addcontentsline{toc}{section}{1.Indexation}
-Par soucis de temps et de mémoire, il est nécessaire d'indexer les documents du corpus. Les indexes permettent de ne pas devoir relire pour chaque requête, l'intégralité du corpus. Par ailleurs ils permettent d'obtenir l'information sur un document en \bigO{1}.
+Dans un soucis de temps et de mémoire, il est nécessaire d'indexer les documents du corpus. Les indexes permettent de ne pas devoir relire pour chaque requête, l'intégralité du corpus. Par ailleurs ils permettent d'obtenir l'information sur un document en \bigO{1}.
 \subsection*{1.Collections de documents}
 \addcontentsline{toc}{subsection}{1.Collections de documents}
-Nous avons travaillé sur deux corpus comportant plusieurs requêtes ainsi que les documents pertinents trouvées par des humains. Ces réponses se structurent sous forme de liste comprenant le numéro des documents en lien avec la requête. Le corpus CACM regroupe des résumés d'articles provenant de la partie communication du journal ACM. Ce corpus compte 4204 textes et 64 requêtes. Le corpus CISI comporte 2460 textes et 112 requêtes.
+Nous avons travaillé sur deux corpus comportant plusieurs requêtes ainsi que les réponses pour chacune d'elles trouvées par des humains. Ces réponses se structurent sous forme de liste comprenant le numéro des documents en lien avec la requête. Le corpus CACM regroupe des résumés d'articles provenant de la partie communication du journal ACM. Ce corpus compte 4204 textes et 64 requêtes. Le corpus CISI comporte 2460 textes et 112 requêtes.
 \subsection*{2.Transformation des textes}
 \addcontentsline{toc}{subsection}{2.Transformation des textes}
-Avant d'analyser les textes nous avons appliqué pour chacun d'entre eux un algorithme de stemmatisation permettant d'avoir une structure unifiée entre chaque texte. Cette transformation consiste à garder la racine de chaque mot et de supprimer les suffixes. Les mots de chaque requête sont ainsi trouvés parmi les documents, peu importe leurs suffixes.
+Avant d'analyser les textes nous avons appliqué pour chacun d'entre eux un algorithme de stemmatisation permettant d'avoir une structure unifiée entre chaque texte. Cette transformation consiste à garder la racine de chaque mot et de supprimer les suffixe. Les mots de chaque requête sont ainsi trouvés parmi les documents, peu importe leurs suffixes.
 \subsection*{3.L'indexation}
 \addcontentsline{toc}{subsection}{3.L'indexation}
 
-L'indexation s'est faite en deux étapes. Premièrement nous avons créé un index par document c'est à dire que pour chaque documents nous avons calculé le nombre de fois ou chaque mot apparaît. Le deuxième index que nous avons créé sert à calculer pour chaque mot de l'ensemble du corpus l'ensemble des documents dans lequel il apparaît ainsi que son nombre d'apparition dans ceux-ci. Ces indexes sont enregistrés dans des fichiers \textbf{random access file} pour une plus grande rapidité d'accès à l'information.
+L'indexation s'est faite en deux étapes. Premièrement nous avons créé un index par document c'est à dire que pour chaque documents nous avons calculé le nombre de fois ou chaque mot apparaît. Le deuxième index que nous avons créé sert à calculer pour chaque mot de l'ensemble du corpus l'ensemble des documents dans lequel il apparaît ainsi que son nombre d'apparition dans ceux-ci. Ces indexes sont enregistrer dans des fichiers random access file pour une plus grande rapidité d'accès à l'information.
 
 \section*{2.Modèle vectoriel}
 \addcontentsline{toc}{section}{2.Modèle vectoriel}
 
-Le modèle vectoriel est un algorithme de recherche d'informations permettant de transformer un document ou une requête sous forme de vecteurs et pouvoir ainsi calculer la similarité entre un document et une requête en utilisant la similarité cosinus entre ces deux représentations. L'autre méthode pour calculer la similarité entre un document et une requête est de les représenter avec une pondération pour chaque mot et de faire le produit vectoriel entre les deux. Différents calculs de pondérations ont été appliqués, la plus connue étant celle du TF-IDF qui est le calcul de la fréquence de chaque mot divisé par la fréquence d'apparition du mot dans le corpus entier, pour donner moins d'importance aux mots présents très souvent tels que les déterminants. 
+Le modèle vectoriel est un algorithme de recherche d'informations permettant de transformer un document ou une requête sous forme de vecteurs et pouvoir ainsi calculer la similarité entre un document et une requête en utilisant la similarité cosinus entre ces deux représentations. L'autre méthode pour calculer la similarité entre un document et une requête est de les représenter avec une pondération et de faire le produit vectoriel entre les deux. Différents calculs de pondérations ont été appliqués, la plus connue étant celle du TF-IDF qui est le calcul de la fréquence de chaque mot divisé par la fréquence d'apparition du mot dans le corpus entier, pour donner moins d'importance aux mots présents très souvent tels que les déterminants. 
 
 
 
@@ -121,7 +121,7 @@ La précision moyenne se calcule sur l'ensemble des précisions obtenues après 
 \section*{4.Modèles probabilistes}
 \addcontentsline{toc}{section}{4.Modèles probabilistes}
 
-Au contraire du modèle vectoriel, il n'est pas nécessaire de transformer l'espace des documents sous forme de vecteurs. La similarité entre un document et une requête est calculée à l'aide de formules probabilistes.
+Au contraire du modèle vectoriel, il n'est pas nécessaire de transformer espace des documents sous forme de vecteurs. La similarité entre un document et une requête est calculé à l'aide de formules probabiliste.
 
 \subsection*{1.Modèle de langue}
 \addcontentsline{toc}{subsection}{1.Modèle de langue}
@@ -141,67 +141,24 @@ Où k1 est entre 1 et 2, et $b\approx0.75$
 
 \section*{5.Marche aléatoires sur les graphes}
 \addcontentsline{toc}{section}{5.Marche aléatoires sur les graphes}
-Sur le web, les pages sont considérées comme des documents, ces pages sont reliés entre elles par des liens. Pour chaque page il existent donc des liens sortants et des liens entrants. Ces liens entre documents forment donc un graphe. Les corpus CACM et CISI que nous utilisons contiennent des fichiers de relations permettant d'appliquer des algorithmes de marche aléatoires. Le principe de ces algorithmes repose sur le fait que plus un document a de document qui pointe vers celui-ci, plus ce document est important. Ces algorithmes permettent donc de choisir les documents les plus important parmi un ensemble de documents liés à une requête, cet ensemble de documents est initialement trouvé grâce a un algorithme de recherche d'information cité avant (modèle vectoriel ou probabiliste).
+Sur le web les pages sont considérées comme des documents, ces pages sont reliés entre elles par des liens. Pour chaque page il existent donc des liens sortants et des liens entrants. Ces liens entre documents forment donc un graphe. Les corpus CACM et CISI que nous utilisons contiennent des fichiers de relations permettant d'appliquer des algorithmes de marche aléatoires. Le principe de ces algorithmes repose sur le fait que plus un document a de (document qui pointe vers celui-ci) plus ce document est important. Ces algorithmes permettent donc de choisir les documents les plus important parmi un ensemble de documents liés à une requête, cet ensemble de documents est initialement trouvé grâce a un algorithme de recherche d'information cité avant (modèle vectoriel ou probabiliste).
 
 \subsection*{1.Page Rank}
 \addcontentsline{toc}{subsection}{1.Page Rank}
-Le page rank est l'algorithme qui a fait la notoriété du moteur de recherche Google. Le principe est de partir d'un ensemble \textbf{V} de documents censés être pertinents pour une requête, puis de faire naviguer un "surfeur" à partir d'un des documents de \textbf{V} à travers le graphe. Une fois que l'algorithme se termine(nombre n d'itérations ou convergence de l'algorithme), les documents avec la plus grande probabilité d'apparition correspondent aux documents avec le meilleur score de similarité.
-
+Le page rank est l'algorithme qui a fait la notoriété du moteur de recherche Google. Le principe est de partir d'un ensemble \textbf{V} de documents censés être pertinents pour une requête, puis de faire naviguer un "surfeur" à partir d'un des documents de \textbf{V} à travers le graphe. Une fois que l'algorithme se termine(nombre n d'itérations ou convergence de l'algorithme), les documents avec la plus grande probabilité d'apparition correspondent alors aux documents avec le meilleur score.
 \subsection*{2.HITS}
 \addcontentsline{toc}{subsection}{2.HITS}
-L'algorithme de HITS repose sur l'identification de deux types de documents, les autorités(pages ayant beaucoup de liens entrants) et les hubs(pages ayant beaucoup de liens sortants). Les scores de chacun se renforcent mutuellement, après convergence les documents les plus pertinents sont ceux ayant leurs scores d'autorité le plus haut.
-
-
-
-
-
-
-
-
-
-
 
 \section*{6.Combinaison des scores}
 \addcontentsline{toc}{section}{6.Combinaison des scores}
 
-Le principe est de créer un classifieur linéaire qui nous permet de savoir si un document est pertinent ou non. Pour chaque document les features prisent en compte sont le score de chacun des modèles. D'autres features peuvent être prisent en compte tel que la longueur, la somme des idfs de la requête et des documents. La labellisation des documents se faisant pour chaque requête à l'aide de la liste des documents pertinents trouvés manuellement.
-
-\section*{7.Optimisation des paramètres}
-\addcontentsline{toc}{section}{7.Optimisation des paramètres}
-Les optimisation ont été fait en cross validation (ensemble de test et un ensemble de train) pour le corpus CACM.\\
-Nous avons optimisé le paramètre lambda du modèle de langue à l'aide d'un grid search.\\
- \begin{center}
- \includegraphics[width=0.7\textwidth]{lambdaLM}
-\end{center}
-
-Nous avons optimisé le paramètre k du modèle OKAPI à l'aide d'un grid search.\\
- \begin{center}
- \includegraphics[width=0.7\textwidth]{k_OKAPI}
-\end{center}
-
-
-
-
-
-
-
-
-%\section*{7.Comparaison des scores entre différentes mesures}
-%\addcontentsline{toc}{section}{7.Comparaison des scores entre différentes mesures}
-
-
-
-
-
-
-
-
-
+\section*{7.Comparaison des scores entre différentes mesures}
+\addcontentsline{toc}{section}{7.Comparaison des scores entre différentes mesures}
 
 
 \chapter*{Conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
-Nous avons programmé l'ensemble du moteur de recherche en Scala, hormis la partie Parser et Stemmatisation faites en Java. Ce projet nous a donc permit d'apprendre à maîtriser un langage en plus des connaissances statistiques et algorithmiques utilisées dans la mise en place d'un moteur de recherche. 
+Nous avons programmé l'ensemble du moteur de recherche en Scala, hormis la partie Parser et Stemmatisation faites en Java. Ce projet nous a donc permis d'apprendre à maîtriser un langage en plus des connaissances statistiques et algorithmiques utilisées dans la mise en place d'un moteur de recherche. En ce qui concerne les performances nous concluons que la combinaison de modèles est une bonne méthode pour augmenter la pertinence des résultats. 
 
 
 

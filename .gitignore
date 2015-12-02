@@ -2,6 +2,8 @@
 __pycache__/
 *.ipynb_checkpoints
 
+AS/TME4/chen
+AS/TME4/mnist
 
 *.aux
 

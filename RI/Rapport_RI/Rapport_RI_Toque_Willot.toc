@@ -14,6 +14,6 @@
 \contentsline {section}{5.Marche al\IeC {\'e}atoires sur les graphes}{5}
 \contentsline {subsection}{1.Page Rank}{5}
 \contentsline {subsection}{2.HITS}{5}
-\contentsline {section}{6.Combinaison des scores}{6}
-\contentsline {section}{7.Optimisation des param\IeC {\`e}tres}{6}
-\contentsline {chapter}{Conclusion}{7}
+\contentsline {section}{6.Combinaison des scores}{5}
+\contentsline {section}{7.Comparaison des scores entre diff\IeC {\'e}rentes mesures}{5}
+\contentsline {chapter}{Conclusion}{6}

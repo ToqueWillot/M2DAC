@@ -9,8 +9,8 @@ mnist = require 'mnist'
 
 -- Apprentissage par descente de gradient
 function fit(mlp, criterion, data, labels, lr, nIter)
-   local lr = lr or 1e-4
-   local nIter = nIter or 1200
+   local lr = lr or 1e-2
+   local nIter = nIter or 1000
   --  local choices = torch.LongTensor((#data)[1])
 
    for i = 1,nIter do
@@ -90,11 +90,9 @@ end
 trainset = mnist.traindataset()
 testset = mnist.testdataset()
 
--- nEx_train = 2500
--- nEx_test = 500
 
-nEx_train = 5000
-nEx_test = 1000
+nEx_train = 2500
+nEx_test = 500
 
 class = {0,1,2,3,4,5,6,7,8,9}
 nClass= #class
@@ -125,16 +123,10 @@ end
 -- 	     20
 --              }
 
--- layerSize = {(#trainData)[2],
---                     65,
---                     21,
---                     7
---             }
-
 layerSize = {(#trainData)[2],
                     65,
-                    50,
-                    40
+                    21,
+                    7
             }
 
  -- layerSize = {(#trainData)[2],
@@ -158,7 +150,7 @@ for i=1,(#layerSize)-1 do
    -- (derniere) sortie du forward des encoders précédents
    encoder=nn.Linear(layerSize[i],layerSize[i+1])
    decoder=nn.Linear(layerSize[i+1],layerSize[i])
-   encoderFIT=autoEncoderFit(encoder,decoder,x,mse,1e-1,x:size(1))  --1e-1  0.91
+   encoderFIT=autoEncoderFit(encoder,decoder,x,mse,1e-1,x:size(1))
    -- on ajoute dans le deepencoder l'encoder à présent fitté plus
    -- un nn tanh
    deepEncoder:add(encoderFIT)
@@ -196,7 +188,7 @@ print(torch.add(trainLabels:long(),-pred):eq(0):double():mean())
 --A present que l'on a ajusté les poids de chaque layer on fit
 -- l'ensemble du réseau.
 print("Fine tuning...en cours")
-fit(deepClassifier, cec, trainData, trainLabels, 1e-2, x:size(1)*30)  --1e-2
+fit(deepClassifier, cec, trainData, trainLabels, 1e-2, x:size(1)*30)
 
 -- Evaluation en train
 pred = deepClassifier:forward(trainData)
