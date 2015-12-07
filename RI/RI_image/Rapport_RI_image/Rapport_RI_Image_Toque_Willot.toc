@@ -1,0 +1,13 @@
+\select@language {french}
+\contentsline {chapter}{Introduction}{3}
+\contentsline {section}{1.Les images}{3}
+\contentsline {subsection}{1.Collections de documents}{3}
+\contentsline {subsection}{2.Indexation visuelle}{3}
+\contentsline {section}{2.Algorithme d'apprentissage structur\IeC {\'e}}{3}
+\contentsline {section}{3.Classifieur multi-classes}{3}
+\contentsline {subsection}{1.Evaluation du classifieur multi-classes}{3}
+\contentsline {section}{4.Classifieur multi-classes}{3}
+\contentsline {subsection}{1.Evaluation du classifieur hi\IeC {\'e}rarchique}{3}
+\contentsline {section}{5.Mod\IeC {\`e}les de ranking}{3}
+\contentsline {subsection}{1.Evaluation du ranking}{3}
+\contentsline {chapter}{Conclusion}{4}

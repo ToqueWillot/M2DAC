@@ -1,0 +1,135 @@
+\documentclass[a4paper,11pt]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[francais]{babel}
+\usepackage{graphicx}
+\usepackage{epsf}
+\usepackage{epsfig}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{caption}
+\usepackage{subcaption}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\usepackage{amssymb}
+\setcounter{tocdepth}{5}
+\setcounter{secnumdepth}{5}
+\providecommand{\keywords}[1]{\textbf{\textit{Index terms---}} #1}
+\usepackage{geometry}
+\geometry{ hmargin=2.5cm, vmargin=2.5cm } 
+\setcounter{tocdepth}{5}
+\lstset{frame=tblr,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+\newcommand{\bigO}[1]{\ensuremath{\mathop{}\mathopen{}O\mathopen{}\left(#1\right)}}
+\pagestyle{plain}
+
+
+
+\begin{document}
+
+~\\\\\\\\\\
+\begin{center}
+\mbox{\huge RAPPORT de l'UE : RI - Recherche d'informations}\\~\\ \mbox{ }\\ \textbf{\LARGE Création d'un moteur de recherche d'images}
+\end{center}~\\
+\begin{center}\large Paul Willot et Florian Toqué\end{center}
+\begin{center}\large 9 Novembre 2015 \end{center}~\\\\\\\\\\\\\\\\\
+%\rule{\linewidth}{.1pt}
+%\begin{center}Abstract\end{center}
+\begin{center}\textbf{\Large{Résumé}}\end{center}
+\large{Ce rapport aborde les différentes étapes que nous avons suivies pour construire les briques d'un moteur de recherche d'images.}\\\\\\\\\\\\\\\\\\\\\\\\
+\rule{\linewidth}{.5pt}
+\textsc{Mots-clés:}\\
+Moteur de recherche d'image --- BOW --- SIFTS --- Apprentissage structuré --- Classifieur multi-classes et hiérarchique\\\\\\
+
+
+
+\newpage
+\tableofcontents
+
+
+
+
+
+
+
+\chapter*{{\centering Introduction}}
+\addcontentsline{toc}{chapter}{Introduction}
+Les moteurs de recherche servent à retrouver de l'information parmi un ensemble de documents. Pour chaque requête posée, leur action est de retourner les documents les plus pertinents. 
+
+\section*{1.Les images}
+\addcontentsline{toc}{section}{1.Les images}
+
+\subsection*{1.Collections de documents}
+\addcontentsline{toc}{subsection}{1.Collections de documents}
+
+\subsection*{2.Indexation visuelle}
+\addcontentsline{toc}{subsection}{2.Indexation visuelle}
+
+\section*{2.Algorithme d'apprentissage structuré}
+\addcontentsline{toc}{section}{2.Algorithme d'apprentissage structuré}
+
+
+
+
+\section*{3.Classifieur multi-classes}
+\addcontentsline{toc}{section}{3.Classifieur multi-classes}
+
+\subsection*{1.Evaluation du classifieur multi-classes}
+\addcontentsline{toc}{subsection}{1.Evaluation du classifieur multi-classes}
+
+\section*{4.Classifieur hiérarchique}
+\addcontentsline{toc}{section}{4.Classifieur multi-classes}
+
+\subsection*{1.Evaluation du classifieur hiérarchique}
+\addcontentsline{toc}{subsection}{1.Evaluation du classifieur hiérarchique}
+
+
+
+
+\section*{5.Modèles de ranking}
+\addcontentsline{toc}{section}{5.Modèles de ranking}
+
+\subsection*{1.Evaluation du ranking}
+\addcontentsline{toc}{subsection}{1.Evaluation du ranking}
+
+\chapter*{Conclusion}
+\addcontentsline{toc}{chapter}{Conclusion}
+
+
+
+%\section*{1.Nom\_section}
+%\addcontentsline{toc}{section}{1.Nom\_section}
+
+%\subsection*{1.Nom\_subsection}
+%\addcontentsline{toc}{subsection}{1.Nom\_subsection}
+
+%\subsubsection*{1.Nom\_subsubsection}
+%\addcontentsline{toc}{subsubsection}{1.Nom\_subsubsection}
+
+
+
+
+
+%ajouter des images png \hfill si ajout d'une autre photo à côté
+%\includegraphics[width=0.5\textwidth]{nom_image}\hfill
+%\includegraphics[width=0.5\textwidth]{nom_image}
+
+
+
+\end{document}
