@@ -10,7 +10,6 @@ from __future__ import absolute_import
 from __future__ import print_function  
 
 # Standard imports
-get_ipython().magic(u'matplotlib inline')
 import os
 import sklearn
 import matplotlib.pyplot as plt
@@ -48,7 +47,10 @@ print("STARTED...")
 
 # In[3]:
 
-get_ipython().run_cell_magic(u'time', u'', u'#filename = "data/train.csv"\nfilename = "data/reduced_train_10000.csv"\nraw = pd.read_csv(filename)\nraw = raw.set_index(\'Id\')')
+#filename = "data/train.csv"
+filename = "data/reduced_train_10000.csv"
+raw = pd.read_csv(filename)
+raw = raw.set_index('Id')
 
 
 # In[4]:
