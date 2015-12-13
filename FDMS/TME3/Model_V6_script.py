@@ -6,11 +6,11 @@
 # In[1]:
 
 # from __future__ import exam_success
-from __future__ import absolute_import 
-from __future__ import print_function  
+from __future__ import absolute_import
+from __future__ import print_function
 
 # Standard imports
-get_ipython().magic(u'matplotlib inline')
+
 import os
 import sklearn
 import matplotlib.pyplot as plt
@@ -37,7 +37,7 @@ import xgboost as xgb
 
 # For neural networks models
 from keras.models import Sequential
-from keras.layers.core import Dense, Dropout, Activation 
+from keras.layers.core import Dense, Dropout, Activation
 from keras.optimizers import SGD, RMSprop
 
 
@@ -48,8 +48,11 @@ print("STARTED...")
 
 # In[3]:
 
-get_ipython().run_cell_magic(u'time', u'', u'#filename = "data/train.csv"\nfilename = "data/reduced_train_10000.csv"\nraw = pd.read_csv(filename)\nraw = raw.set_index(\'Id\')')
-
+#laaa
+filename = "data/train.csv"
+#filename = "data/reduced_train_10000.csv"
+raw = pd.read_csv(filename)
+raw = raw.set_index('Id')
 
 # In[4]:
 
@@ -59,7 +62,7 @@ print("LOADED")
 # In[5]:
 
 # Considering that the gauge may concentrate the rainfall, we set the cap to 1000
-# Comment this line to analyse the complete dataset 
+# Comment this line to analyse the complete dataset
 l = len(raw)
 raw = raw[raw['Expected'] < 300]  #1000
 print("Dropped %d (%0.2f%%)"%(l-len(raw),(l-len(raw))/float(l)*100))
@@ -86,9 +89,9 @@ def getXy(raw):
        u'RhoHV_5x5_50th', u'RhoHV_5x5_90th', u'Zdr', u'Zdr_5x5_10th',
        u'Zdr_5x5_50th', u'Zdr_5x5_90th', u'Kdp', u'Kdp_5x5_10th',
        u'Kdp_5x5_50th', u'Kdp_5x5_90th'])
-    
+
     data = raw[selected_columns]
-    
+
     docX, docY = [], []
     for i in data.index.unique():
         if isinstance(data.loc[i],pd.core.series.Series):
@@ -145,11 +148,11 @@ W = nmf.fit_transform(XX_rescaled)
 def addFeatures(X,mf=0):
     # used to fill fully empty datas
     #global_means = np.nanmean(X,0)
-    
+
     XX=[]
     nbFeatures=float(len(X[0][0]))
     for idxt,t in enumerate(X):
-        
+
         # compute means, ignoring nan when possible, marking it when fully filled with nan
         nm = np.nanmean(t,0)
         tt=[]
@@ -160,15 +163,15 @@ def addFeatures(X,mf=0):
             else:
                 tt.append(0)
         tmp = np.append(nm,np.append(tt,tt.count(0)/nbFeatures))
-        
+
         # faster if working on fully filled data:
         #tmp = np.append(np.nanmean(np.array(t),0),(np.array(t)[1:] - np.array(t)[:-1]).sum(0) )
-        
+
         # add the percentiles
         tmp = np.append(tmp,np.nanpercentile(t,10,axis=0))
         tmp = np.append(tmp,np.nanpercentile(t,50,axis=0))
         tmp = np.append(tmp,np.nanpercentile(t,90,axis=0))
-        
+
         for idx,i in enumerate(tmp):
             if np.isnan(i):
                 tmp[idx]=0
@@ -197,7 +200,7 @@ def addFeatures(X,mf=0):
             if np.isfinite(dbz):
                 mmperhr = pow(pow(10, dbz/10)/200, 0.625)
                 sum = sum + mmperhr * hours
-        
+
         if not(mf is 0):
             tmp = np.append(tmp,mf[idxt])
 
@@ -262,8 +265,9 @@ print("MODEL 3 TRAINED")
 
 # In[21]:
 
-#filename = "data/test.csv"
-filename = "data/reduced_test_5000.csv"
+#laaa
+filename = "data/test.csv"
+#filename = "data/reduced_test_5000.csv"
 test = pd.read_csv(filename)
 test = test.set_index('Id')
 
@@ -291,9 +295,9 @@ def getX(raw):
        u'RhoHV_5x5_50th', u'RhoHV_5x5_90th', u'Zdr', u'Zdr_5x5_10th',
        u'Zdr_5x5_50th', u'Zdr_5x5_90th', u'Kdp', u'Kdp_5x5_10th',
        u'Kdp_5x5_50th', u'Kdp_5x5_90th'])
-    
+
     data = raw[selected_columns]
-    
+
     docX= []
     for i in data.index.unique():
         if isinstance(data.loc[i],pd.core.series.Series):
@@ -424,6 +428,3 @@ print("OVER")
 
 
 # In[ ]:
-
-
-
