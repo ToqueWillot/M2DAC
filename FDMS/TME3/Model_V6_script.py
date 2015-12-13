@@ -10,7 +10,10 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 # Standard imports
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/master
 import os
 import sklearn
 import matplotlib.pyplot as plt
@@ -48,11 +51,19 @@ print("STARTED...")
 
 # In[3]:
 
+<<<<<<< HEAD
 #laaa
 filename = "data/train.csv"
 #filename = "data/reduced_train_10000.csv"
 raw = pd.read_csv(filename)
 raw = raw.set_index('Id')
+=======
+#filename = "data/train.csv"
+filename = "data/reduced_train_10000.csv"
+raw = pd.read_csv(filename)
+raw = raw.set_index('Id')
+
+>>>>>>> origin/master
 
 # In[4]:
 

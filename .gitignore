@@ -64,3 +64,13 @@ ImagesASTME4/
 *.dat
 
 RenduTME3_4_FlorianToque/
+
+FDMS/TME3/etreg.pkl
+
+FDMS/TME3/gbr.pkl
+
+FDMS/TME3/knn.pkl
+
+FDMS/TME3/rfr.pkl
+
+FDMS/TME3/xgbr.pkl
