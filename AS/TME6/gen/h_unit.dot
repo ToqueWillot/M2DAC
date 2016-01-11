@@ -1,0 +1,72 @@
+digraph G {
+	graph [bb="0,0,531,728"];
+	node [label="\N",
+		shape=oval
+	];
+	n1	 [height=0.74639,
+		label="Node1\nmodule = nn.Tanh",
+		pos="265,117",
+		tooltip="[train.lua]:108",
+		width=2.3354];
+	n2	 [height=0.74639,
+		label="Node2\ninput = {}",
+		pos="265,27",
+		tooltip="[[C]]:-1",
+		width=1.449];
+	n1 -> n2	 [pos="e,265,54.046 265,90.073 265,81.999 265,72.943 265,64.296"];
+	n3	 [height=1.041,
+		label="Node3\nmodule = nn.CAddTable\lmapindex = {Node4,Node5}",
+		pos="265,218",
+		tooltip="[train.lua]:107",
+		width=3.4507];
+	n3 -> n1	 [pos="e,265,143.92 265,180.42 265,171.8 265,162.63 265,154.04"];
+	n4	 [height=0.74639,
+		label="Node4\nmodule = nn.Linear(21 -> 10)",
+		pos="128,319",
+		tooltip="[train.lua]:104",
+		width=3.5652];
+	n4 -> n3	 [pos="e,218.28,252.76 162.57,293.02 176.95,282.63 193.99,270.31 210.01,258.73"];
+	n5	 [height=0.74639,
+		label="Node5\nmodule = nn.Linear(10 -> 10)",
+		pos="403,319",
+		tooltip="[train.lua]:105",
+		width=3.5652];
+	n5 -> n3	 [pos="e,312.06,252.76 368.18,293.02 353.69,282.63 336.52,270.31 320.39,258.73"];
+	n6	 [height=0.74639,
+		label="Node6\nmodule = nn.Identity",
+		pos="145,409",
+		tooltip="[train.lua]:101",
+		width=2.6117];
+	n6 -> n4	 [pos="e,133.03,346.05 139.99,382.07 138.41,373.91 136.64,364.74 134.96,356.01"];
+	n7	 [height=0.74639,
+		label="Node7\nmodule = nn.Identity",
+		pos="385,409",
+		tooltip="[train.lua]:102",
+		width=2.6117];
+	n7 -> n5	 [pos="e,397.67,346.05 390.3,382.07 391.97,373.91 393.85,364.74 395.63,356.01"];
+	n8	 [height=1.041,
+		label="Node8\ninput = {}\lselectindex = 2",
+		pos="157,510",
+		tooltip="[[C]]:-1-2",
+		width=1.9543];
+	n8 -> n6	 [pos="e,148.14,435.92 152.57,472.42 151.52,463.8 150.41,454.63 149.37,446.04"];
+	n9	 [height=1.041,
+		label="Node9\ninput = {}\lselectindex = 1",
+		pos="339,510",
+		tooltip="[[C]]:-1-1",
+		width=1.9543];
+	n9 -> n7	 [pos="e,372.97,435.9 355.48,473.54 359.76,464.31 364.38,454.38 368.66,445.17"];
+	n10	 [height=0.74639,
+		label="Node10\nnSplitOutputs = 2",
+		pos="236,611",
+		tooltip="[[C]]:-1-mnode",
+		width=2.2307];
+	n10 -> n8	 [pos="e,183.96,544.79 215.86,584.76 208.06,574.99 198.93,563.54 190.21,552.62"];
+	n10 -> n9	 [pos="e,305.44,543.25 261.73,585.27 272.68,574.74 285.73,562.2 297.96,550.45"];
+	n11	 [height=0.74639,
+		label="Node11\ninput = {}",
+		pos="236,701",
+		tooltip="[[C]]:-1",
+		width=1.449];
+	n11 -> n10	 [pos="e,236,638.05 236,674.07 236,666 236,656.94 236,648.3"];
+}

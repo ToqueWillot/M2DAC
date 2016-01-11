@@ -1,0 +1,28 @@
+[program started on Sat Jan  9 00:41:17 2016] 
+[command line arguments] 
+max_epochs 20 
+seq_length 5 
+batch_size 1 
+rundir gen,data_dir=data/perso,length_gen=300,seed_text=aabb 
+temperature 1 
+data_dir data/perso 
+model lstm 
+learning_rate 0.002 
+seed_text aabb 
+length_gen 300 
+latent_size 10 
+[----------------------] 
+Generated Text : aabbmuncfmmerfnpfopdtn.n.apotiio 
+ineu roxpp
+bpoadcdlndmbp.lfibxbsaergr.nlpnmgbbcd 
+bxaffdcs.bat
+pumxtsl.efbopixmsssbc.po n
+alexainmcpipx lrdr robfit.fbnsbborlg.xdib tmeeg
+r
+p
+act tmto .tfsilsrgad.unsaraatmuusspxlocrlfesndieesr onlbmbtbm.ifliapns
+
+xcebe
+dmse. bfoolblpxnacsmc ogaorri.cpcra
+gbep.nmpslc
+bc 

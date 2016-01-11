@@ -1,0 +1,17 @@
+[program started on Sat Jan  9 00:40:41 2016] 
+[command line arguments] 
+max_epochs 20 
+seq_length 5 
+batch_size 1 
+rundir gen,data_dir=data/perso,length_gen=5,seed_text=aa 
+temperature 1 
+data_dir data/perso 
+model lstm 
+learning_rate 0.002 
+seed_text aa 
+length_gen 5 
+latent_size 10 
+[----------------------] 
+Generated Text : aa
+t 
+m 

@@ -1,0 +1,15 @@
+[program started on Sun Jan 10 17:24:56 2016] 
+[command line arguments] 
+max_epochs 20 
+seq_length 5 
+batch_size 1 
+rundir gen 
+temperature 1 
+data_dir data/tinyshakespeare 
+model lstm 
+learning_rate 0.002 
+seed_text a 
+length_gen 30 
+latent_size 10 
+[----------------------] 
+Generated Text : ax,PVv'IxXw-CDSlGT3pKtdD:NZ,Sb' 

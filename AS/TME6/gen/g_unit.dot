@@ -1,0 +1,35 @@
+digraph G {
+	graph [bb="0,0,256,414"];
+	node [label="\N",
+		shape=oval
+	];
+	n1	 [height=0.74639,
+		label="Node1\nmodule = nn.SoftMax",
+		pos="128,117",
+		tooltip="[train.lua]:96",
+		width=2.7262];
+	n2	 [height=0.74639,
+		label="Node2\ninput = {}",
+		pos="128,27",
+		tooltip="[[C]]:-1",
+		width=1.449];
+	n1 -> n2	 [pos="e,128,54.046 128,90.073 128,81.999 128,72.943 128,64.296"];
+	n3	 [height=0.74639,
+		label="Node3\nmodule = nn.Linear(10 -> 21)",
+		pos="128,207",
+		tooltip="[train.lua]:95",
+		width=3.5652];
+	n3 -> n1	 [pos="e,128,144.05 128,180.07 128,172 128,162.94 128,154.3"];
+	n4	 [height=0.74639,
+		label="Node4\nmodule = nn.Identity",
+		pos="128,297",
+		tooltip="[train.lua]:94",
+		width=2.6117];
+	n4 -> n3	 [pos="e,128,234.05 128,270.07 128,262 128,252.94 128,244.3"];
+	n5	 [height=0.74639,
+		label="Node5\ninput = {}",
+		pos="128,387",
+		tooltip="[[C]]:-1",
+		width=1.449];
+	n5 -> n4	 [pos="e,128,324.05 128,360.07 128,352 128,342.94 128,334.3"];
+}
